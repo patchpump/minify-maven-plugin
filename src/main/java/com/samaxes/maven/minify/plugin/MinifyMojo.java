@@ -143,6 +143,14 @@ public class MinifyMojo extends AbstractMojo {
     private boolean skipMinify;
 
     /**
+     * Gzip target file into targetfile.gz
+     *
+     * @since 1.5.7
+     */
+    @Parameter(property = "gzip", defaultValue = "false")
+    private boolean gzip;
+
+    /**
      * Webapp source directory.
      */
     @Parameter(property = "webappSourceDir", defaultValue = "${basedir}/src/main/webapp")
@@ -594,7 +602,7 @@ public class MinifyMojo extends AbstractMojo {
             String cssFinalFile) throws FileNotFoundException {
         return new ProcessCSSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
                 webappSourceDir, webappTargetDir, cssSourceDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
-                cssTargetDir, cssFinalFile, cssEngine, yuiConfig);
+                cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
     }
 
     private ProcessFilesTask createJSTask(YuiConfig yuiConfig, ClosureConfig closureConfig, List<String> jsSourceFiles,
@@ -602,6 +610,6 @@ public class MinifyMojo extends AbstractMojo {
             throws FileNotFoundException {
         return new ProcessJSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
                 webappSourceDir, webappTargetDir, jsSourceDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
-                jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig);
+                jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
     }
 }

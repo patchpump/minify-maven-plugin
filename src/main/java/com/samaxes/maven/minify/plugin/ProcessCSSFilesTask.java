@@ -67,10 +67,10 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
     public ProcessCSSFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
             boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
             String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig) throws FileNotFoundException {
+            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, boolean gzip) throws FileNotFoundException {
         super(log, verbose, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
                 webappTargetDir, inputDir, sourceFiles, sourceIncludes, sourceExcludes, outputDir, outputFilename,
-                engine, yuiConfig);
+                engine, yuiConfig, gzip);
     }
 
     /**
@@ -108,6 +108,6 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
             throw e;
         }
 
-        logCompressionGains(mergedFile, minifiedFile);
+        gzip(mergedFile, minifiedFile);
     }
 }

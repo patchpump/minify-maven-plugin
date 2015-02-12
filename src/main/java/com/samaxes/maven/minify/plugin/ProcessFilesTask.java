@@ -49,271 +49,277 @@ import com.samaxes.maven.minify.plugin.MinifyMojo.Engine;
  */
 public abstract class ProcessFilesTask implements Callable<Object> {
 
-    public static final String TEMP_SUFFIX = ".tmp";
+	public static final String TEMP_SUFFIX = ".tmp";
 
-    protected final Log log;
+	protected final Log log;
 
-    protected final boolean verbose;
+	protected final boolean verbose;
 
-    protected final Integer bufferSize;
+	protected final Integer bufferSize;
 
-    protected final String charset;
+	protected final String charset;
 
-    protected final String suffix;
+	protected final String suffix;
 
-    protected final boolean nosuffix;
+	protected final boolean nosuffix;
 
-    protected final boolean skipMerge;
+	protected final boolean skipMerge;
 
-    protected final boolean skipMinify;
+	protected final boolean skipMinify;
 
-    protected final Engine engine;
+	protected final Engine engine;
 
-    protected final YuiConfig yuiConfig;
+	protected final YuiConfig yuiConfig;
 
-    private final File sourceDir;
+	private final File sourceDir;
 
-    private final File targetDir;
+	private final File targetDir;
 
-    private final String mergedFilename;
+	private final String mergedFilename;
 
-    private final List<File> files = new ArrayList<File>();
+	private final List<File> files = new ArrayList<File>();
 
-    private final boolean sourceFilesEmpty;
+	private final boolean sourceFilesEmpty;
 
-    private final boolean sourceIncludesEmpty;
+	private final boolean sourceIncludesEmpty;
 
-    /**
-     * Task constructor.
-     *
-     * @param log Maven plugin log
-     * @param verbose display additional info
-     * @param bufferSize size of the buffer used to read source files
-     * @param charset if a character set is specified, a byte-to-char variant allows the encoding to be selected.
-     *        Otherwise, only byte-to-byte operations are used
-     * @param suffix final file name suffix
-     * @param nosuffix whether to use a suffix for the minified file name or not
-     * @param skipMerge whether to skip the merge step or not
-     * @param skipMinify whether to skip the minify step or not
-     * @param webappSourceDir web resources source directory
-     * @param webappTargetDir web resources target directory
-     * @param inputDir directory containing source files
-     * @param sourceFiles list of source files to include
-     * @param sourceIncludes list of source files to include
-     * @param sourceExcludes list of source files to exclude
-     * @param outputDir directory to write the final file
-     * @param outputFilename the output file name
-     * @param engine minify processor engine selected
-     * @param yuiConfig YUI Compressor configuration
-     * @throws FileNotFoundException when the given source file does not exist
-     */
-    public ProcessFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
-            boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
-            String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig) throws FileNotFoundException {
-        this.log = log;
-        this.verbose = verbose;
-        this.bufferSize = bufferSize;
-        this.charset = charset;
-        this.suffix = suffix + ".";
-        this.nosuffix = nosuffix;
-        this.skipMerge = skipMerge;
-        this.skipMinify = skipMinify;
-        this.engine = engine;
-        this.yuiConfig = yuiConfig;
+	private final boolean gzip;
 
-        this.sourceDir = new File(webappSourceDir + File.separator + inputDir);
-        this.targetDir = new File(webappTargetDir + File.separator + outputDir);
-        this.mergedFilename = outputFilename;
-        for (String sourceFilename : sourceFiles) {
-            addNewSourceFile(mergedFilename, sourceFilename);
-        }
-        for (File sourceInclude : getFilesToInclude(sourceIncludes, sourceExcludes)) {
-            if (!files.contains(sourceInclude)) {
-                addNewSourceFile(mergedFilename, sourceInclude);
-            }
-        }
-        this.sourceFilesEmpty = sourceFiles.isEmpty();
-        this.sourceIncludesEmpty = sourceIncludes.isEmpty();
-    }
+	/**
+	 * Task constructor.
+	 *
+	 * @param log Maven plugin log
+	 * @param verbose display additional info
+	 * @param bufferSize size of the buffer used to read source files
+	 * @param charset if a character set is specified, a byte-to-char variant allows the encoding to be selected.
+	 *        Otherwise, only byte-to-byte operations are used
+	 * @param suffix final file name suffix
+	 * @param nosuffix whether to use a suffix for the minified file name or not
+	 * @param skipMerge whether to skip the merge step or not
+	 * @param skipMinify whether to skip the minify step or not
+	 * @param webappSourceDir web resources source directory
+	 * @param webappTargetDir web resources target directory
+	 * @param inputDir directory containing source files
+	 * @param sourceFiles list of source files to include
+	 * @param sourceIncludes list of source files to include
+	 * @param sourceExcludes list of source files to exclude
+	 * @param outputDir directory to write the final file
+	 * @param outputFilename the output file name
+	 * @param engine minify processor engine selected
+	 * @param yuiConfig YUI Compressor configuration
+	 * @throws FileNotFoundException when the given source file does not exist
+	 */
+	public ProcessFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
+			boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
+			String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
+			String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, boolean gzip) throws FileNotFoundException {
+		this.log = log;
+		this.verbose = verbose;
+		this.bufferSize = bufferSize;
+		this.charset = charset;
+		this.suffix = suffix + ".";
+		this.nosuffix = nosuffix;
+		this.skipMerge = skipMerge;
+		this.skipMinify = skipMinify;
+		this.engine = engine;
+		this.yuiConfig = yuiConfig;
+		this.gzip = gzip;
 
-    /**
-     * Method executed by the thread.
-     *
-     * @throws IOException when the merge or minify steps fail
-     */
-    @Override
-    public Object call() throws IOException {
-        synchronized (log) {
-            String fileType = (this instanceof ProcessCSSFilesTask) ? "CSS" : "JavaScript";
-            log.info("Starting " + fileType + " task:");
+		this.sourceDir = new File(webappSourceDir + File.separator + inputDir);
+		this.targetDir = new File(webappTargetDir + File.separator + outputDir);
+		this.mergedFilename = outputFilename;
+		for (String sourceFilename : sourceFiles) {
+			addNewSourceFile(mergedFilename, sourceFilename);
+		}
+		for (File sourceInclude : getFilesToInclude(sourceIncludes, sourceExcludes)) {
+			if (!files.contains(sourceInclude)) {
+				addNewSourceFile(mergedFilename, sourceInclude);
+			}
+		}
+		this.sourceFilesEmpty = sourceFiles.isEmpty();
+		this.sourceIncludesEmpty = sourceIncludes.isEmpty();
+	}
 
-            if (!files.isEmpty() && (targetDir.exists() || targetDir.mkdirs())) {
-                if (skipMerge) {
-                    log.info("Skipping the merge step...");
-                    String sourceBasePath = sourceDir.getAbsolutePath();
+	/**
+	 * Method executed by the thread.
+	 *
+	 * @throws IOException when the merge or minify steps fail
+	 */
+	@Override
+	public Object call() throws IOException {
+		synchronized (log) {
+			String fileType = (this instanceof ProcessCSSFilesTask) ? "CSS" : "JavaScript";
+			log.info("Starting " + fileType + " task:");
 
-                    for (File mergedFile : files) {
-                        // Create folders to preserve sub-directory structure when only minifying
-                        String originalPath = mergedFile.getAbsolutePath();
-                        String subPath = originalPath.substring(sourceBasePath.length(),
-                                originalPath.lastIndexOf(File.separator));
-                        File targetPath = new File(targetDir.getAbsolutePath() + subPath);
-                        targetPath.mkdirs();
+			if (!files.isEmpty() && (targetDir.exists() || targetDir.mkdirs())) {
+				if (skipMerge) {
+					log.info("Skipping the merge step...");
+					String sourceBasePath = sourceDir.getAbsolutePath();
 
-                        File minifiedFile = new File(targetPath, (nosuffix) ? mergedFile.getName()
-                                : FileUtils.basename(mergedFile.getName()) + suffix
-                                        + FileUtils.getExtension(mergedFile.getName()));
-                        minify(mergedFile, minifiedFile);
-                    }
-                } else if (skipMinify) {
-                    File mergedFile = new File(targetDir, mergedFilename);
-                    merge(mergedFile);
-                    log.info("Skipping the minify step...");
-                } else {
-                    File mergedFile = new File(targetDir, (nosuffix) ? mergedFilename + TEMP_SUFFIX : mergedFilename);
-                    merge(mergedFile);
-                    File minifiedFile = new File(targetDir, (nosuffix) ? mergedFilename
-                            : FileUtils.basename(mergedFilename) + suffix + FileUtils.getExtension(mergedFilename));
-                    minify(mergedFile, minifiedFile);
-                    if (nosuffix) {
-                        if (!mergedFile.delete()) {
-                            mergedFile.deleteOnExit();
-                        }
-                    }
-                }
-                log.info("");
-            } else if (!sourceFilesEmpty || !sourceIncludesEmpty) {
-                // 'files' list will be empty if source file paths or names added to the project's POM are invalid.
-                log.error("No valid " + fileType + " source files found to process.");
-            }
-        }
+					for (File mergedFile : files) {
+						// Create folders to preserve sub-directory structure when only minifying
+						String originalPath = mergedFile.getAbsolutePath();
+						String subPath = originalPath.substring(sourceBasePath.length(),
+								originalPath.lastIndexOf(File.separator));
+						File targetPath = new File(targetDir.getAbsolutePath() + subPath);
+						targetPath.mkdirs();
 
-        return null;
-    }
+						File minifiedFile = new File(targetPath, (nosuffix) ? mergedFile.getName()
+								: FileUtils.basename(mergedFile.getName()) + suffix
+								+ FileUtils.getExtension(mergedFile.getName()));
+						minify(mergedFile, minifiedFile);
+					}
+				} else if (skipMinify) {
+					File mergedFile = new File(targetDir, mergedFilename);
+					merge(mergedFile);
+					log.info("Skipping the minify step...");
+				} else {
+					File mergedFile = new File(targetDir, (nosuffix) ? mergedFilename + TEMP_SUFFIX : mergedFilename);
+					merge(mergedFile);
+					File minifiedFile = new File(targetDir, (nosuffix) ? mergedFilename
+							: FileUtils.basename(mergedFilename) + suffix + FileUtils.getExtension(mergedFilename));
+					minify(mergedFile, minifiedFile);
+					if (nosuffix) {
+						if (!mergedFile.delete()) {
+							mergedFile.deleteOnExit();
+						}
+					}
+				}
+				log.info("");
+			} else if (!sourceFilesEmpty || !sourceIncludesEmpty) {
+				// 'files' list will be empty if source file paths or names added to the project's POM are invalid.
+				log.error("No valid " + fileType + " source files found to process.");
+			}
+		}
 
-    /**
-     * Merges a list of source files. Create missing parent directories if needed.
-     *
-     * @param mergedFile output file resulting from the merged step
-     * @throws IOException when the merge step fails
-     */
-    protected void merge(File mergedFile) throws IOException {
-        mergedFile.getParentFile().mkdirs();
+		return null;
+	}
 
-        try (InputStream sequence = new SequenceInputStream(new SourceFilesEnumeration(log, files, verbose));
-                OutputStream out = new FileOutputStream(mergedFile);
-                InputStreamReader sequenceReader = new InputStreamReader(sequence, charset);
-                OutputStreamWriter outWriter = new OutputStreamWriter(out, charset)) {
-            log.info("Creating the merged file [" + ((verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].");
+	/**
+	 * Merges a list of source files. Create missing parent directories if needed.
+	 *
+	 * @param mergedFile output file resulting from the merged step
+	 * @throws IOException when the merge step fails
+	 */
+	protected void merge(File mergedFile) throws IOException {
+		mergedFile.getParentFile().mkdirs();
 
-            IOUtil.copy(sequenceReader, outWriter, bufferSize);
-        } catch (IOException e) {
-            log.error("Failed to concatenate files.", e);
-            throw e;
-        }
-    }
+		try (InputStream sequence = new SequenceInputStream(new SourceFilesEnumeration(log, files, verbose));
+				OutputStream out = new FileOutputStream(mergedFile);
+				InputStreamReader sequenceReader = new InputStreamReader(sequence, charset);
+				OutputStreamWriter outWriter = new OutputStreamWriter(out, charset)) {
+			log.info("Creating the merged file [" + ((verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].");
 
-    /**
-     * Minifies a source file. Create missing parent directories if needed.
-     *
-     * @param mergedFile input file resulting from the merged step
-     * @param minifiedFile output file resulting from the minify step
-     * @throws IOException when the minify step fails
-     */
-    abstract void minify(File mergedFile, File minifiedFile) throws IOException;
+			IOUtil.copy(sequenceReader, outWriter, bufferSize);
+		} catch (IOException e) {
+			log.error("Failed to concatenate files.", e);
+			throw e;
+		}
+	}
 
-    /**
-     * Logs compression gains.
-     *
-     * @param mergedFile input file resulting from the merged step
-     * @param minifiedFile output file resulting from the minify step
-     */
-    void logCompressionGains(File mergedFile, File minifiedFile) {
-        try {
-            File temp = File.createTempFile(minifiedFile.getName(), ".gz");
+	/**
+	 * Minifies a source file. Create missing parent directories if needed.
+	 *
+	 * @param mergedFile input file resulting from the merged step
+	 * @param minifiedFile output file resulting from the minify step
+	 * @throws IOException when the minify step fails
+	 */
+	abstract void minify(File mergedFile, File minifiedFile) throws IOException;
 
-            try (InputStream in = new FileInputStream(minifiedFile);
-                    OutputStream out = new FileOutputStream(temp);
-                    GZIPOutputStream outGZIP = new GZIPOutputStream(out)) {
-                IOUtil.copy(in, outGZIP, bufferSize);
-            }
+	/**
+	 * Compress the minifed target file.
+	 *
+	 * @param mergedFile input file resulting from the merged step
+	 * @param minifiedFile output file resulting from the minify step
+	 */
 
-            log.info("Uncompressed size: " + mergedFile.length() + " bytes.");
-            log.info("Compressed size: " + minifiedFile.length() + " bytes minified (" + temp.length()
-                    + " bytes gzipped).");
+	void gzip(File mergedFile, File minifiedFile) {
+		if(!gzip)
+			return;
 
-            temp.deleteOnExit();
-        } catch (IOException e) {
-            log.debug("Failed to calculate the gzipped file size.", e);
-        }
-    }
+		try {
+			File compressedFile = new File(minifiedFile.getCanonicalPath() + ".gz");
+			try (
+				InputStream in = new FileInputStream(minifiedFile);
+				OutputStream out = new FileOutputStream(compressedFile);
+				GZIPOutputStream outGZIP = new GZIPOutputStream(out)
+			) {
+					IOUtil.copy(in, outGZIP, bufferSize);
+			}
 
-    /**
-     * Logs an addition of a new source file.
-     *
-     * @param finalFilename the final file name
-     * @param sourceFilename the source file name
-     * @throws FileNotFoundException when the given source file does not exist
-     */
-    private void addNewSourceFile(String finalFilename, String sourceFilename) throws FileNotFoundException {
-        File sourceFile = new File(sourceDir, sourceFilename);
+			log.info("Uncompressed size: " + mergedFile.length() + " bytes.");
+			log.info("Compressed size: " + minifiedFile.length() + " bytes minified (" + compressedFile.length() + " bytes gzipped).");
 
-        addNewSourceFile(finalFilename, sourceFile);
-    }
+		} catch (IOException e) {
+			log.debug("Failed to calculate the gzipped file size.", e);
+		}
+	}
 
-    /**
-     * Logs an addition of a new source file.
-     *
-     * @param finalFilename the final file name
-     * @param sourceFile the source file
-     * @throws FileNotFoundException when the given source file does not exist
-     */
-    private void addNewSourceFile(String finalFilename, File sourceFile) throws FileNotFoundException {
-        if (sourceFile.exists()) {
-            if (finalFilename.equalsIgnoreCase(sourceFile.getName())) {
-                log.warn("The source file [" + ((verbose) ? sourceFile.getPath() : sourceFile.getName())
-                        + "] has the same name as the final file.");
-            }
-            log.debug("Adding source file [" + ((verbose) ? sourceFile.getPath() : sourceFile.getName()) + "].");
-            files.add(sourceFile);
-        } else {
-            throw new FileNotFoundException("The source file ["
-                    + ((verbose) ? sourceFile.getPath() : sourceFile.getName()) + "] does not exist.");
-        }
-    }
+	/**
+	 * Logs an addition of a new source file.
+	 *
+	 * @param finalFilename the final file name
+	 * @param sourceFilename the source file name
+	 * @throws FileNotFoundException when the given source file does not exist
+	 */
+	private void addNewSourceFile(String finalFilename, String sourceFilename) throws FileNotFoundException {
+		File sourceFile = new File(sourceDir, sourceFilename);
 
-    /**
-     * Returns the files to copy. Default exclusions are used when the excludes list is empty.
-     *
-     * @param includes list of source files to include
-     * @param excludes list of source files to exclude
-     * @return the files to copy
-     */
-    private List<File> getFilesToInclude(List<String> includes, List<String> excludes) {
-        List<File> includedFiles = new ArrayList<File>();
+		addNewSourceFile(finalFilename, sourceFile);
+	}
 
-        if (includes != null && !includes.isEmpty()) {
-            DirectoryScanner scanner = new DirectoryScanner();
+	/**
+	 * Logs an addition of a new source file.
+	 *
+	 * @param finalFilename the final file name
+	 * @param sourceFile the source file
+	 * @throws FileNotFoundException when the given source file does not exist
+	 */
+	private void addNewSourceFile(String finalFilename, File sourceFile) throws FileNotFoundException {
+		if (sourceFile.exists()) {
+			if (finalFilename.equalsIgnoreCase(sourceFile.getName())) {
+				log.warn("The source file [" + ((verbose) ? sourceFile.getPath() : sourceFile.getName())
+						+ "] has the same name as the final file.");
+			}
+			log.debug("Adding source file [" + ((verbose) ? sourceFile.getPath() : sourceFile.getName()) + "].");
+			files.add(sourceFile);
+		} else {
+			throw new FileNotFoundException("The source file ["
+					+ ((verbose) ? sourceFile.getPath() : sourceFile.getName()) + "] does not exist.");
+		}
+	}
 
-            scanner.setIncludes(includes.toArray(new String[0]));
-            scanner.setExcludes(excludes.toArray(new String[0]));
-            scanner.addDefaultExcludes();
-            scanner.setBasedir(sourceDir);
-            scanner.scan();
+	/**
+	 * Returns the files to copy. Default exclusions are used when the excludes list is empty.
+	 *
+	 * @param includes list of source files to include
+	 * @param excludes list of source files to exclude
+	 * @return the files to copy
+	 */
+	private List<File> getFilesToInclude(List<String> includes, List<String> excludes) {
+		List<File> includedFiles = new ArrayList<File>();
 
-            for (String includedFilename : scanner.getIncludedFiles()) {
-                includedFiles.add(new File(sourceDir, includedFilename));
-            }
+		if (includes != null && !includes.isEmpty()) {
+			DirectoryScanner scanner = new DirectoryScanner();
 
-            Collections.sort(includedFiles, new Comparator<File>() {
-                @Override
-                public int compare(File o1, File o2) {
-                    return o1.getName().compareToIgnoreCase(o2.getName());
-                }
-            });
-        }
+			scanner.setIncludes(includes.toArray(new String[0]));
+			scanner.setExcludes(excludes.toArray(new String[0]));
+			scanner.addDefaultExcludes();
+			scanner.setBasedir(sourceDir);
+			scanner.scan();
 
-        return includedFiles;
-    }
+			for (String includedFilename : scanner.getIncludedFiles()) {
+				includedFiles.add(new File(sourceDir, includedFilename));
+			}
+
+			Collections.sort(includedFiles, new Comparator<File>() {
+				@Override
+				public int compare(File o1, File o2) {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
+			});
+		}
+
+		return includedFiles;
+	}
 }
