@@ -80,11 +80,11 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
     public ProcessJSFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
             boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
             String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, ClosureConfig closureConfig)
+            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, ClosureConfig closureConfig, boolean gzip)
             throws FileNotFoundException {
         super(log, verbose, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
                 webappTargetDir, inputDir, sourceFiles, sourceIncludes, sourceExcludes, outputDir, outputFilename,
-                engine, yuiConfig);
+                engine, yuiConfig, gzip);
 
         this.closureConfig = closureConfig;
     }
@@ -172,7 +172,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
             throw e;
         }
 
-        logCompressionGains(mergedFile, minifiedFile);
+        gzip(mergedFile, minifiedFile);
     }
 
     private void flushSourceMap(File sourceMapOutputFile, String minifyFileName, SourceMap sourceMap) {
