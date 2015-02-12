@@ -2,25 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>
+	<groupId>patchpump.minify</groupId>
+	<artifactId>minify-maven-plugin</artifactId>
+	<version>2.7.5-PATCHPUMP-R1</version>
+	<packaging>maven-plugin</packaging>
 
-    <groupId>com.samaxes.maven</groupId>
-    <artifactId>minify-maven-plugin</artifactId>
-    <version>1.7.5-SNAPSHOT</version>
-    <packaging>maven-plugin</packaging>
+	<name>minify-maven-plugin</name>
 
-    <name>Minify Maven Plugin</name>
-    <description>Combine and minimize JavaScript and CSS files for faster page loading.</description>
-    <url>https://github.com/samaxes/minify-maven-plugin</url>
-    <inceptionYear>2009</inceptionYear>
-    <organization>
-        <name>samaxes</name>
-        <url>http://www.samaxes.com/</url>
-    </organization>
+	<description></description>
+	<inceptionYear>2009</inceptionYear>
+	<mailingLists></mailingLists>
+	<organization></organization>
+	
+	<url>https://github.com/patchpump/minify-maven-plugin</url>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -40,16 +35,25 @@
             </roles>
             <timezone>0</timezone>
         </developer>
+        <developer>
+            <id>patchpump</id>
+            <name>patchpump</name>
+            <url>https://github.com/patchpump/</url>
+            <roles>
+                <role>Fork maintainer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
     </developers>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/samaxes/minify-maven-plugin/issues</url>
+        <url>https://github.com/patchpump/minify-maven-plugin/issues</url>
     </issueManagement>
     <scm>
-        <connection>scm:git:git://github.com/samaxes/minify-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:samaxes/minify-maven-plugin.git</developerConnection>
-        <url>https://github.com/samaxes/minify-maven-plugin</url>
+        <connection>scm:git:git://github.com/patchpump/minify-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:patchpump/minify-maven-plugin.git</developerConnection>
+        <url>https://github.com/patchpump/minify-maven-plugin</url>
     </scm>
 
     <prerequisites>
@@ -69,21 +73,6 @@
                     <version>1.0.0</version>
                     <configuration>
                         <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-docck-plugin</artifactId>
-                                        <versionRange>[1.0,)</versionRange>
-                                        <goals>
-                                            <goal>check</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
@@ -91,18 +80,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-docck-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
