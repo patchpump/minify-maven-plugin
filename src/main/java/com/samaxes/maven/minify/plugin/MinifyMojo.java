@@ -181,6 +181,12 @@ public class MinifyMojo extends AbstractMojo {
     private String cssSourceDir;
 
     /**
+     * CSS source include directory.
+     */
+    @Parameter(property = "cssSourceIncludeDir", defaultValue = "css")
+    private String cssSourceIncludeDir;
+
+    /**
      * CSS source file names list.
      */
     @Parameter(property = "cssSourceFiles", alias = "cssFiles")
@@ -237,6 +243,12 @@ public class MinifyMojo extends AbstractMojo {
      */
     @Parameter(property = "jsSourceDir", defaultValue = "js")
     private String jsSourceDir;
+
+    /**
+     * JavaScript source directory for jsSourceIncludes.
+     */
+    @Parameter(property = "jsSourceIncludeDir", defaultValue = "js")
+    private String jsSourceIncludeDir;
 
     /**
      * JavaScript source file names list.
@@ -542,6 +554,12 @@ public class MinifyMojo extends AbstractMojo {
         if (Strings.isNullOrEmpty(jsTargetDir)) {
             jsTargetDir = jsSourceDir;
         }
+        if (Strings.isNullOrEmpty(jsSourceIncludeDir)) {
+        	jsSourceIncludeDir = jsSourceDir;
+        }
+        if (Strings.isNullOrEmpty(cssSourceIncludeDir)) {
+        	cssSourceIncludeDir = cssSourceDir;
+        }
         if (Strings.isNullOrEmpty(charset)) {
             charset = Charset.defaultCharset().name();
         }
@@ -601,7 +619,7 @@ public class MinifyMojo extends AbstractMojo {
             List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
             String cssFinalFile) throws FileNotFoundException {
         return new ProcessCSSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
-                webappSourceDir, webappTargetDir, cssSourceDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
+                webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
                 cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
     }
 
@@ -609,7 +627,7 @@ public class MinifyMojo extends AbstractMojo {
             List<String> jsSourceIncludes, List<String> jsSourceExcludes, String jsFinalFile)
             throws FileNotFoundException {
         return new ProcessJSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
-                webappSourceDir, webappTargetDir, jsSourceDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
+                webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
                 jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
     }
 }
