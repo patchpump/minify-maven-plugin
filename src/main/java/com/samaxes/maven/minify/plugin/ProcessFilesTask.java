@@ -72,6 +72,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	protected final YuiConfig yuiConfig;
 
 	private final File sourceDir;
+	private final File sourceIncludeDir;
 
 	private final File targetDir;
 
@@ -100,6 +101,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * @param webappSourceDir web resources source directory
 	 * @param webappTargetDir web resources target directory
 	 * @param inputDir directory containing source files
+	 * @param sourceIncludeDir directory containing source files to include
 	 * @param sourceFiles list of source files to include
 	 * @param sourceIncludes list of source files to include
 	 * @param sourceExcludes list of source files to exclude
@@ -111,7 +113,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 */
 	public ProcessFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
 			boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
-			String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
+			String inputDir, String sourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
 			String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, boolean gzip) throws FileNotFoundException {
 		this.log = log;
 		this.verbose = verbose;
@@ -127,6 +129,8 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 
 		this.sourceDir = new File(webappSourceDir + File.separator + inputDir);
 		this.targetDir = new File(webappTargetDir + File.separator + outputDir);
+		this.sourceIncludeDir = new File(webappSourceDir + File.separator + sourceIncludeDir);
+
 		this.mergedFilename = outputFilename;
 		for (String sourceFilename : sourceFiles) {
 			addNewSourceFile(mergedFilename, sourceFilename);
@@ -305,11 +309,11 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 			scanner.setIncludes(includes.toArray(new String[0]));
 			scanner.setExcludes(excludes.toArray(new String[0]));
 			scanner.addDefaultExcludes();
-			scanner.setBasedir(sourceDir);
+			scanner.setBasedir(sourceIncludeDir);
 			scanner.scan();
 
 			for (String includedFilename : scanner.getIncludedFiles()) {
-				includedFiles.add(new File(sourceDir, includedFilename));
+				includedFiles.add(new File(sourceIncludeDir, includedFilename));
 			}
 
 			Collections.sort(includedFiles, new Comparator<File>() {

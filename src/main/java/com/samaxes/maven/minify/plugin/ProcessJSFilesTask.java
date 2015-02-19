@@ -67,6 +67,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
      * @param webappSourceDir web resources source directory
      * @param webappTargetDir web resources target directory
      * @param inputDir directory containing source files
+     * @param jsSourceIncludeDir directory containing source files to incolude
      * @param sourceFiles list of source files to include
      * @param sourceIncludes list of source files to include
      * @param sourceExcludes list of source files to exclude
@@ -79,11 +80,11 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
      */
     public ProcessJSFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
             boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
-            String inputDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
+            String inputDir, String jsSourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
             String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, ClosureConfig closureConfig, boolean gzip)
             throws FileNotFoundException {
         super(log, verbose, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
-                webappTargetDir, inputDir, sourceFiles, sourceIncludes, sourceExcludes, outputDir, outputFilename,
+                webappTargetDir, inputDir, jsSourceIncludeDir, sourceFiles, sourceIncludes, sourceExcludes, outputDir, outputFilename,
                 engine, yuiConfig, gzip);
 
         this.closureConfig = closureConfig;
