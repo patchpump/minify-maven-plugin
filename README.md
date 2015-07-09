@@ -2,7 +2,11 @@
 
 Minify Maven Plugin combines and minimizes your CSS and JavaScript files for faster page loading. It produces a merged and a minified version of your CSS and JavaScript resources which can be re-used across your project.
 
-Under the hood, it uses the [YUI Compressor](http://yui.github.com/yuicompressor/) and [Google Closure Compiler](https://developers.google.com/closure/compiler/) but has a layer of abstraction around these tools which allows for other tools to be added in the future.
+Under the hood, it uses the following compressors:
+
+- [YUI Compressor] (https://yui.github.com/yuicompressor)
+- [Google Closure Compiler] (https://github.com/google/closure-compiler)
+- [UglifyJS 2] (https://github.com/mishoo/UglifyJS2) (terribly slow byt procuces the smallest files)
 
 ## Benefits
 
@@ -26,7 +30,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
     <plugin>
       <groupId>com.samaxes.maven</groupId>
       <artifactId>minify-maven-plugin</artifactId>
-      <version>1.7.4</version>
+      <version>2.7.5-PATCHPUMP-R4</version>
       <executions>
         <execution>
           <id>default-minify</id>
@@ -54,7 +58,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
 </build>
 ```
 
-For more information, check the [plugin documentation](http://samaxes.github.com/minify-maven-plugin/) or the [demo application](https://github.com/samaxes/minify-maven-plugin/releases/download/minify-maven-plugin-1.7.4/minify-maven-plugin-demo-1.7.4-src.zip).
+For more information, check https://github.com/patchpump/minify-maven-plugin
 
 ## System Requirements
   
@@ -63,4 +67,4 @@ If you need to support older versions of Java please use the version 1.6 or bell
 
 ## License
 
-This distribution is licensed under the terms of the Apache License, Version 2.0 (see LICENSE.txt).
+This distribution is licensed under the terms of the Apache License, Version 2.0.
