@@ -66,7 +66,9 @@ public class MinifyMojo extends AbstractMojo {
         /** YUI Compressor */
         YUI,
         /** Google Closure Compiler */
-        CLOSURE;
+        CLOSURE,
+        /** https://github.com/mishoo/UglifyJS2 */
+        UGLIFY;
     }
 
     /* ************** */

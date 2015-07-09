@@ -41,6 +41,7 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.samaxes.maven.minify.common.ClosureConfig;
 import com.samaxes.maven.minify.common.JavaScriptErrorReporter;
+import com.samaxes.maven.minify.common.UglifyJS2Compiler;
 import com.samaxes.maven.minify.common.YuiConfig;
 import com.samaxes.maven.minify.plugin.MinifyMojo.Engine;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
@@ -97,7 +98,8 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
      * @param minifiedFile output file resulting from the minify step
      * @throws IOException when the minify step fails
      */
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     protected void minify(File mergedFile, File minifiedFile) throws IOException {
         minifiedFile.getParentFile().mkdirs();
 
@@ -143,8 +145,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
                     writer.append(compiler.toSource());
 
                     if (closureConfig.getSourceMapFormat() != null) {
-                        log.info("Creating the minified file map ["
-                                + ((verbose) ? sourceMapResult.getPath() : sourceMapResult.getName()) + "].");
+                        log.info("Creating the minified file map [" + ((verbose) ? sourceMapResult.getPath() : sourceMapResult.getName()) + "].");
 
                         sourceMapResult.createNewFile();
                         flushSourceMap(sourceMapResult, minifiedFile.getName(), compiler.getSourceMap());
@@ -152,26 +153,27 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
                         writer.append(System.getProperty("line.separator"));
                         writer.append("//# sourceMappingURL=" + sourceMapResult.getName());
                     }
-
                     break;
                 case YUI:
                     log.debug("Using YUI Compressor engine.");
 
-                    JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new JavaScriptErrorReporter(log,
-                            mergedFile.getName()));
+                    JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new JavaScriptErrorReporter(log, mergedFile.getName()));
                     compressor.compress(writer, yuiConfig.getLineBreak(), yuiConfig.isMunge(), verbose,
-                            yuiConfig.isPreserveSemicolons(), yuiConfig.isDisableOptimizations());
+                    	yuiConfig.isPreserveSemicolons(), yuiConfig.isDisableOptimizations());
                     break;
+                case UGLIFY:
+                	log.debug("Using UglifyJS 2 engine.");
+
+                	UglifyJS2Compiler uglifier = new UglifyJS2Compiler();
+                    uglifier.compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
+                	break;
                 default:
-                    log.warn("JavaScript engine not supported.");
+                    log.warn("JavaScript engine [" + engine + "] not supported.");
                     break;
             }
-        } catch (IOException e) {
-            log.error(
-                    "Failed to compress the JavaScript file ["
-                            + ((verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
-            throw e;
-        }
+        } catch (Exception e) {
+            log.error("Failed to compress the JavaScript file [" + ((verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
+            throw new IOException(e);        }
 
         gzip(mergedFile, minifiedFile);
     }
@@ -180,8 +182,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
         try (FileWriter out = new FileWriter(sourceMapOutputFile)) {
             sourceMap.appendTo(out, minifyFileName);
         } catch (IOException e) {
-            log.error("Failed to write the JavaScript Source Map file ["
-                    + ((verbose) ? sourceMapOutputFile.getPath() : sourceMapOutputFile.getName()) + "].", e);
+            log.error("Failed to write the JavaScript Source Map file [" + ((verbose) ? sourceMapOutputFile.getPath() : sourceMapOutputFile.getName()) + "].", e);
         }
     }
 }
