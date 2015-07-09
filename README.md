@@ -28,7 +28,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
 <build>
   <plugins>
     <plugin>
-      <groupId>com.samaxes.maven</groupId>
+      <groupId>patchpump.minify</groupId>
       <artifactId>minify-maven-plugin</artifactId>
       <version>2.7.5-PATCHPUMP-R4</version>
       <executions>
