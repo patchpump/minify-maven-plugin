@@ -29,11 +29,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.maven.plugin.logging.Log;
 import org.mozilla.javascript.EvaluatorException;
 
 import com.google.common.collect.Lists;
+import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -120,7 +122,13 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
                     options.setLanguageIn(closureConfig.getLanguage());
                     options.setAngularPass(closureConfig.getAngularPass());
                     options.setDependencyOptions(closureConfig.getDependencyOptions());
-
+                    if(closureConfig.getWarningLevels() != null) {
+                    	for(Entry<String,String> entry : closureConfig.getWarningLevels().entrySet()) {
+                    		String groupName = entry.getKey();
+                    		String levelName = entry.getValue();
+                           	options.setWarningLevel(groupName, CheckLevel.valueOf(levelName));
+                    	}
+                    }
                     File sourceMapResult = new File(minifiedFile.getPath() + ".map");
                     if (closureConfig.getSourceMapFormat() != null) {
                         options.setSourceMapFormat(closureConfig.getSourceMapFormat());

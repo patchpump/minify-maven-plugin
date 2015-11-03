@@ -4,7 +4,7 @@
 
 	<groupId>patchpump.minify</groupId>
 	<artifactId>minify-maven-plugin</artifactId>
-	<version>2.7.5-PATCHPUMP-R4</version>
+	<version>2.7.5-PATCHPUMP-R5</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>minify-maven-plugin</name>
@@ -174,7 +174,7 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>v20150609</version>
+            <version>v20151015</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

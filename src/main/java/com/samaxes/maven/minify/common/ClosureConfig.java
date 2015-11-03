@@ -19,6 +19,7 @@
 package com.samaxes.maven.minify.common;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
@@ -46,7 +47,9 @@ public class ClosureConfig {
 
     private final Boolean angularPass;
 
-    /**
+    private Map<String,String> warningLevels;
+
+	/**
      * Init Closure Compiler values.
      *
      * @param language the version of ECMAScript used to report errors in the code
@@ -58,7 +61,7 @@ public class ClosureConfig {
      * @param angularPass use {@code @ngInject} annotation to generate Angular injections
      */
     public ClosureConfig(LanguageMode language, CompilationLevel compilationLevel, DependencyOptions dependencyOptions,
-            List<SourceFile> externs, boolean useDefaultExterns, boolean createSourceMap, boolean angularPass) {
+            List<SourceFile> externs, Map<String,String> warningLevels, boolean useDefaultExterns, boolean createSourceMap, boolean angularPass) {
         this.language = language;
         this.compilationLevel = compilationLevel;
         this.dependencyOptions = dependencyOptions;
@@ -66,6 +69,7 @@ public class ClosureConfig {
         this.useDefaultExterns = useDefaultExterns;
         this.sourceMapFormat = (createSourceMap) ? SourceMap.Format.V3 : null;
         this.angularPass = angularPass;
+        this.warningLevels = warningLevels;
     }
 
     /**
@@ -130,4 +134,12 @@ public class ClosureConfig {
     public Boolean getAngularPass() {
         return angularPass;
     }
+
+	public Map<String,String> getWarningLevels() {
+		return warningLevels;
+	}
+
+	public void setWarningLevels(Map<String, String> warningLevels) {
+		this.warningLevels = warningLevels;
+	}
 }

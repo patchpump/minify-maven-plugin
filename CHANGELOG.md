@@ -1,5 +1,20 @@
 # Minify Maven Plugin
 
+## 1.7.5-patchpump-R5
+
+* Add `closureWarningLevels` option
+* Update Google Closure Compiler to v20151015
+
+## 1.7.5-patchpump-R4
+
+* Add UGLIFY engine (terribly slow)
+* Update Google Closure Compiler to v20150609
+
+## 1.7.5-patchpump-R3
+
+* Add `cssSourceIncludeDir` and `jsSourceIncludeDir` options
+* Add `gzip` option for leaving zipped file
+
 ## 1.7.5
 
 * Add support for external bundle configuration (#57).
