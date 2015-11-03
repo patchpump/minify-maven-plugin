@@ -47,6 +47,10 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
               <jsSourceFile>file-n.js</jsSourceFile>
             </jsSourceFiles>
             <jsEngine>CLOSURE</jsEngine>
+            <closureWarningLevels>
+                <misplacedTypeAnnotation>OFF</misplacedTypeAnnotation>
+                <nonStandardJsDocs>OFF</nonStandardJsDocs>
+            </closureWarningLevels>
           </configuration>
           <goals>
             <goal>minify</goal>
