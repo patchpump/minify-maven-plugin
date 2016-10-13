@@ -35,59 +35,58 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class SourceFilesEnumeration implements Enumeration<InputStream> {
 
-    private List<File> files;
+	private List<File> files;
+	private int current = 0;
 
-    private int current = 0;
+	/**
+	 * Enumeration public constructor.
+	 *
+	 * @param log Maven plugin log
+	 * @param files list of files
+	 * @param verbose show source file paths in log output
+	 */
+	public SourceFilesEnumeration(Log log, List<File> files, boolean verbose) {
+		this.files = files;
 
-    /**
-     * Enumeration public constructor.
-     *
-     * @param log Maven plugin log
-     * @param files list of files
-     * @param verbose show source file paths in log output
-     */
-    public SourceFilesEnumeration(Log log, List<File> files, boolean verbose) {
-        this.files = files;
+		for (File file : files) {
+			log.info("Processing source file [" + ((verbose) ? file.getPath() : file.getName()) + "].");
+		}
+	}
 
-        for (File file : files) {
-            log.info("Processing source file [" + ((verbose) ? file.getPath() : file.getName()) + "].");
-        }
-    }
+	/**
+	 * Tests if this enumeration contains more elements.
+	 *
+	 * @return {@code true} if and only if this enumeration object contains at least one more element to provide;
+	 *         {@code false} otherwise.
+	 */
+	@Override
+	public boolean hasMoreElements() {
+		return (current < files.size()) ? true : false;
+	}
 
-    /**
-     * Tests if this enumeration contains more elements.
-     *
-     * @return {@code true} if and only if this enumeration object contains at least one more element to provide;
-     *         {@code false} otherwise.
-     */
-    @Override
-    public boolean hasMoreElements() {
-        return (current < files.size()) ? true : false;
-    }
+	/**
+	 * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
+	 *
+	 * @return the next element of this enumeration.
+	 * @exception NoSuchElementException if no more elements exist.
+	 */
+	@Override
+	public InputStream nextElement() {
+		InputStream is = null;
 
-    /**
-     * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
-     *
-     * @return the next element of this enumeration.
-     * @exception NoSuchElementException if no more elements exist.
-     */
-    @Override
-    public InputStream nextElement() {
-        InputStream is = null;
+		if (!hasMoreElements()) {
+			throw new NoSuchElementException("No more files!");
+		} else {
+			File nextElement = files.get(current);
+			current++;
 
-        if (!hasMoreElements()) {
-            throw new NoSuchElementException("No more files!");
-        } else {
-            File nextElement = files.get(current);
-            current++;
+			try {
+				is = new FileInputStream(nextElement);
+			} catch (FileNotFoundException e) {
+				throw new NoSuchElementException("The path [" + nextElement.getPath() + "] cannot be found.");
+			}
+		}
 
-            try {
-                is = new FileInputStream(nextElement);
-            } catch (FileNotFoundException e) {
-                throw new NoSuchElementException("The path [" + nextElement.getPath() + "] cannot be found.");
-            }
-        }
-
-        return is;
-    }
+		return is;
+	}
 }

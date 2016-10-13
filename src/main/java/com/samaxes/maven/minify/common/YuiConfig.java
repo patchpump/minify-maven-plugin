@@ -23,62 +23,65 @@ package com.samaxes.maven.minify.common;
  */
 public class YuiConfig {
 
-    private final int lineBreak;
+	private final int lineBreak;
+	private final boolean munge;
+	private final boolean preserveSemicolons;
+	private final boolean disableOptimizations;
 
-    private final boolean munge;
+	/**
+	 * Init YuiConfig values.
+	 *
+	 * @param lineBreak split long lines after a specific column
+	 * @param munge obfuscate local symbols
+	 * @param preserveSemicolons preserve unnecessary semicolons
+	 * @param disableOptimizations disable all the built-in micro-optimizations
+	 */
+	public YuiConfig(int lineBreak, boolean munge, boolean preserveSemicolons, boolean disableOptimizations) {
+		this.lineBreak = lineBreak;
+		this.munge = munge;
+		this.preserveSemicolons = preserveSemicolons;
+		this.disableOptimizations = disableOptimizations;
+	}
 
-    private final boolean preserveSemicolons;
+	/**
+	 * Gets the lineBreak.
+	 *
+	 * @return the lineBreak
+	 */
+	public int getLineBreak() {
+		return lineBreak;
+	}
 
-    private final boolean disableOptimizations;
+	/**
+	 * Gets the munge.
+	 *
+	 * @return the munge
+	 */
+	public boolean isMunge() {
+		return munge;
+	}
 
-    /**
-     * Init YuiConfig values.
-     *
-     * @param lineBreak split long lines after a specific column
-     * @param munge obfuscate local symbols
-     * @param preserveSemicolons preserve unnecessary semicolons
-     * @param disableOptimizations disable all the built-in micro-optimizations
-     */
-    public YuiConfig(int lineBreak, boolean munge, boolean preserveSemicolons, boolean disableOptimizations) {
-        this.lineBreak = lineBreak;
-        this.munge = munge;
-        this.preserveSemicolons = preserveSemicolons;
-        this.disableOptimizations = disableOptimizations;
-    }
+	/**
+	 * Gets the preserveSemicolons.
+	 *
+	 * @return the preserveSemicolons
+	 */
+	public boolean isPreserveSemicolons() {
+		return preserveSemicolons;
+	}
 
-    /**
-     * Gets the lineBreak.
-     *
-     * @return the lineBreak
-     */
-    public int getLineBreak() {
-        return lineBreak;
-    }
+	/**
+	 * Gets the disableOptimizations.
+	 *
+	 * @return the disableOptimizations
+	 */
+	public boolean isDisableOptimizations() {
+		return disableOptimizations;
+	}
 
-    /**
-     * Gets the munge.
-     *
-     * @return the munge
-     */
-    public boolean isMunge() {
-        return munge;
-    }
-
-    /**
-     * Gets the preserveSemicolons.
-     *
-     * @return the preserveSemicolons
-     */
-    public boolean isPreserveSemicolons() {
-        return preserveSemicolons;
-    }
-
-    /**
-     * Gets the disableOptimizations.
-     *
-     * @return the disableOptimizations
-     */
-    public boolean isDisableOptimizations() {
-        return disableOptimizations;
-    }
+	@Override
+	public String toString() {
+		return "YuiConfig [lineBreak=" + lineBreak + ", munge=" + munge + ", preserveSemicolons=" + preserveSemicolons
+			+ ", disableOptimizations=" + disableOptimizations + "]";
+	}
 }

@@ -27,12 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
-
-import com.samaxes.maven.minify.common.YuiConfig;
-import com.samaxes.maven.minify.plugin.MinifyMojo.Engine;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
 /**
@@ -40,74 +35,50 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
  */
 public class ProcessCSSFilesTask extends ProcessFilesTask {
 
-    /**
-     * Task constructor.
-     *
-     * @param log Maven plugin log
-     * @param verbose display additional info
-     * @param bufferSize size of the buffer used to read source files
-     * @param charset if a character set is specified, a byte-to-char variant allows the encoding to be selected.
-     *        Otherwise, only byte-to-byte operations are used
-     * @param suffix final file name suffix
-     * @param nosuffix whether to use a suffix for the minified file name or not
-     * @param skipMerge whether to skip the merge step or not
-     * @param skipMinify whether to skip the minify step or not
-     * @param webappSourceDir web resources source directory
-     * @param webappTargetDir web resources target directory
-     * @param inputDir directory containing source files
-     * @param sourceFiles list of source files to include
-     * @param sourceIncludes list of source files to include
-     * @param sourceExcludes list of source files to exclude
-     * @param outputDir directory to write the final file
-     * @param outputFilename the output file name
-     * @param engine minify processor engine selected
-     * @param yuiConfig YUI Compressor configuration
-     * @throws FileNotFoundException when the given source file does not exist
-     */
-    public ProcessCSSFilesTask(Log log, boolean verbose, Integer bufferSize, String charset, String suffix,
-            boolean nosuffix, boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir,
-            String inputDir, String sourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-            String outputDir, String outputFilename, Engine engine, YuiConfig yuiConfig, boolean gzip) throws FileNotFoundException {
-        super(log, verbose, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
-                webappTargetDir, inputDir, sourceIncludeDir, sourceFiles, sourceIncludes, sourceExcludes, outputDir, outputFilename,
-                engine, yuiConfig, gzip);
-    }
+	/**
+	 * Task constructor.
+	 *
+	 * @throws FileNotFoundException when the given source file does not exist
+	 */
 
-    /**
-     * Minifies a CSS file. Create missing parent directories if needed.
-     *
-     * @param mergedFile input file resulting from the merged step
-     * @param minifiedFile output file resulting from the minify step
-     * @throws IOException when the minify step fails
-     */
-    @Override
-    protected void minify(File mergedFile, File minifiedFile) throws IOException {
-        minifiedFile.getParentFile().mkdirs();
+	public ProcessCSSFilesTask(final TaskOptions opt) throws FileNotFoundException {
+		super(opt);
+	}
 
-        try (InputStream in = new FileInputStream(mergedFile);
-                OutputStream out = new FileOutputStream(minifiedFile);
-                InputStreamReader reader = new InputStreamReader(in, charset);
-                OutputStreamWriter writer = new OutputStreamWriter(out, charset)) {
-            log.info("Creating the minified file [" + ((verbose) ? minifiedFile.getPath() : minifiedFile.getName())
-                    + "].");
+	/**
+	 * Minifies a CSS file. Create missing parent directories if needed.
+	 *
+	 * @param mergedFile input file resulting from the merged step
+	 * @param minifiedFile output file resulting from the minify step
+	 * @throws IOException when the minify step fails
+	 */
+	@Override
+	protected void minify(File mergedFile, File minifiedFile) throws IOException {
 
-            switch (engine) {
-                case YUI:
-                    log.debug("Using YUI Compressor engine.");
+		minifiedFile.getParentFile().mkdirs();
+		try (InputStream in = new FileInputStream(mergedFile);
+			OutputStream out = new FileOutputStream(minifiedFile);
+			InputStreamReader reader = new InputStreamReader(in, opt.charset);
+			OutputStreamWriter writer = new OutputStreamWriter(out, opt.charset)) {
 
-                    CssCompressor compressor = new CssCompressor(reader);
-                    compressor.compress(writer, yuiConfig.getLineBreak());
-                    break;
-                default:
-                    log.warn("CSS engine not supported.");
-                    break;
-            }
-        } catch (IOException e) {
-            log.error("Failed to compress the CSS file [" + ((verbose) ? mergedFile.getPath() : mergedFile.getName())
-                    + "].", e);
-            throw e;
-        }
+			log.info("Creating the minified file [" + ((opt.verbose) ? minifiedFile.getPath() : minifiedFile.getName()) + "].");
 
-        gzip(mergedFile, minifiedFile);
-    }
+			switch (opt.engine) {
+			case YUI:
+				log.debug("Using YUI Compressor engine.");
+				CssCompressor compressor = new CssCompressor(reader);
+				compressor.compress(writer, opt.yuiConfig.getLineBreak());
+				break;
+
+			default:
+				log.warn("CSS engine not supported.");
+				break;
+			}
+		} catch (IOException e) {
+			log.error("Failed to compress the CSS file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
+			throw e;
+		}
+
+		gzip(mergedFile, minifiedFile);
+	}
 }

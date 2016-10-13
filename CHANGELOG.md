@@ -1,16 +1,25 @@
 # Minify Maven Plugin
 
-## 1.7.5-patchpump-R5
+## 2.8.0-patchpump-R0
+
+* Fix relative path issue on linux
+* Remove default paths, paths now relative to webapp dir
+* Remove all deprecated options
+* Update Google Closure Compiler to v20160208
+* Update uglifyjs to 2.7.3
+* Require Java 8
+
+## 2.7.5-patchpump-R5
 
 * Add `closureWarningLevels` option
 * Update Google Closure Compiler to v20151015
 
-## 1.7.5-patchpump-R4
+## 2.7.5-patchpump-R4
 
 * Add UGLIFY engine (terribly slow)
 * Update Google Closure Compiler to v20150609
 
-## 1.7.5-patchpump-R3
+## 2.7.5-patchpump-R3
 
 * Add `cssSourceIncludeDir` and `jsSourceIncludeDir` options
 * Add `gzip` option for leaving zipped file

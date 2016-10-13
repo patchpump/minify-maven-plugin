@@ -25,23 +25,23 @@ import java.util.List;
  */
 public class AggregationConfiguration {
 
-    private List<Aggregation> bundles;
+	private List<Aggregation> bundles;
 
-    /**
-     * Gets the bundles.
-     *
-     * @return the bundles
-     */
-    public List<Aggregation> getBundles() {
-        return bundles;
-    }
+	/**
+	 * Gets the bundles.
+	 *
+	 * @return the bundles
+	 */
+	public List<Aggregation> getBundles() {
+		return bundles;
+	}
 
-    /**
-     * Sets the bundles.
-     *
-     * @param bundles the bundles to set
-     */
-    public void setBundles(List<Aggregation> bundles) {
-        this.bundles = bundles;
-    }
+	/**
+	 * Sets the bundles.
+	 *
+	 * @param bundles the bundles to set
+	 */
+	public void setBundles(List<Aggregation> bundles) {
+		this.bundles = bundles;
+	}
 }

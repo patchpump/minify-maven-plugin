@@ -60,37 +60,21 @@ import com.samaxes.maven.minify.common.YuiConfig;
 @Mojo(name = "minify", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, threadSafe = true)
 public class MinifyMojo extends AbstractMojo {
 
-	/**
-	 * Engine used for minification.
-	 */
 	public static enum Engine {
-		/** YUI Compressor */
-		YUI,
-		/** Google Closure Compiler */
-		CLOSURE,
-		/** https://github.com/mishoo/UglifyJS2 */
-		UGLIFY;
+		YUI, CLOSURE, UGLIFY;
 	}
-
-	/* ************** */
-	/* Global Options */
-	/* ************** */
-
-	/**
-	 * Show source file paths in log output.
-	 *
-	 * @since 1.5.2
-	 * @deprecated Use {@link #verbose} instead.
-	 */
-	@Deprecated
-	@Parameter(property = "debug")
-	private Boolean debug;
 
 	/**
 	 * Display additional informational messages and warnings.
 	 */
 	@Parameter(property = "verbose", defaultValue = "false")
 	private boolean verbose;
+
+	/**
+	 * Display even more additional informational messages.
+	 */
+	@Parameter(property = "debug", defaultValue = "false")
+	private boolean debug;
 
 	/**
 	 * Size of the buffer used to read source files.
@@ -173,20 +157,16 @@ public class MinifyMojo extends AbstractMojo {
 	@Parameter(property = "bundleConfiguration")
 	private String bundleConfiguration;
 
-	/* *********** */
-	/* CSS Options */
-	/* *********** */
-
 	/**
 	 * CSS source directory.
 	 */
-	@Parameter(property = "cssSourceDir", defaultValue = "css")
+	@Parameter(property = "cssSourceDir", defaultValue = "")
 	private String cssSourceDir;
 
 	/**
 	 * CSS source include directory.
 	 */
-	@Parameter(property = "cssSourceIncludeDir", defaultValue = "css")
+	@Parameter(property = "cssSourceIncludeDir", defaultValue = "")
 	private String cssSourceIncludeDir;
 
 	/**
@@ -237,20 +217,16 @@ public class MinifyMojo extends AbstractMojo {
 	@Parameter(property = "cssEngine", defaultValue = "YUI")
 	private Engine cssEngine;
 
-	/* ****************** */
-	/* JavaScript Options */
-	/* ****************** */
-
 	/**
 	 * JavaScript source directory.
 	 */
-	@Parameter(property = "jsSourceDir", defaultValue = "js")
+	@Parameter(property = "jsSourceDir", defaultValue = "")
 	private String jsSourceDir;
 
 	/**
 	 * JavaScript source directory for jsSourceIncludes.
 	 */
-	@Parameter(property = "jsSourceIncludeDir", defaultValue = "js")
+	@Parameter(property = "jsSourceIncludeDir", defaultValue = "")
 	private String jsSourceIncludeDir;
 
 	/**
@@ -302,22 +278,6 @@ public class MinifyMojo extends AbstractMojo {
 	@Parameter(property = "jsEngine", defaultValue = "YUI")
 	private Engine jsEngine;
 
-	/* *************************** */
-	/* YUI Compressor Only Options */
-	/* *************************** */
-
-	/**
-	 * Some source control tools don't like files containing lines longer than, say 8000 characters. The line-break
-	 * option is used in that case to split long lines after a specific column. It can also be used to make the code
-	 * more readable and easier to debug. Specify {@code 0} to get a line break after each semi-colon in JavaScript, and
-	 * after each rule in CSS. Specify {@code -1} to disallow line breaks.
-	 *
-	 * @deprecated Use {@link #yuiLineBreak} instead.
-	 */
-	@Deprecated
-	@Parameter(property = "linebreak")
-	private Integer linebreak;
-
 	/**
 	 * Some source control tools don't like files containing lines longer than, say 8000 characters. The line-break
 	 * option is used in that case to split long lines after a specific column. It can also be used to make the code
@@ -328,29 +288,10 @@ public class MinifyMojo extends AbstractMojo {
 	private int yuiLineBreak;
 
 	/**
-	 * Obfuscate local symbols in addition to minification.
-	 *
-	 * @deprecated Use {@link #yuiNoMunge} instead.
-	 */
-	@Deprecated
-	@Parameter(property = "munge")
-	private Boolean munge;
-
-	/**
 	 * Minify only. Do not obfuscate local symbols.
 	 */
 	@Parameter(property = "yuiNoMunge", defaultValue = "false")
 	private boolean yuiNoMunge;
-
-	/**
-	 * Preserve unnecessary semicolons (such as right before a '}'). This option is useful when compressed code has to
-	 * be run through JSLint.
-	 *
-	 * @deprecated Use {@link #yuiPreserveSemicolons} instead.
-	 */
-	@Deprecated
-	@Parameter(property = "preserveAllSemiColons")
-	private Boolean preserveAllSemiColons;
 
 	/**
 	 * Preserve unnecessary semicolons (such as right before a '}'). This option is useful when compressed code has to
@@ -361,22 +302,9 @@ public class MinifyMojo extends AbstractMojo {
 
 	/**
 	 * Disable all the built-in micro-optimizations.
-	 *
-	 * @deprecated Use {@link #yuiDisableOptimizations} instead.
-	 */
-	@Deprecated
-	@Parameter(property = "disableOptimizations")
-	private Boolean disableOptimizations;
-
-	/**
-	 * Disable all the built-in micro-optimizations.
 	 */
 	@Parameter(property = "yuiDisableOptimizations", defaultValue = "false")
 	private boolean yuiDisableOptimizations;
-
-	/* ************************************ */
-	/* Google Closure Compiler Only Options */
-	/* ************************************ */
 
 	/**
 	 * Refers to which version of ECMAScript to assume when checking for errors in your code.<br/>
@@ -417,7 +345,7 @@ public class MinifyMojo extends AbstractMojo {
 	 * @since patchpump-R5
 	 */
 	@Parameter(property = "closureWarningLevels")
-	private Map<String,String> closureWarningLevels;
+	private Map<String, String> closureWarningLevels;
 
 	/**
 	 * List of JavaScript files containing code that declares function names or other symbols. Use
@@ -488,8 +416,6 @@ public class MinifyMojo extends AbstractMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		checkDeprecatedOptions();
-
 		if (skipMerge && skipMinify) {
 			getLog().warn("Both merge and minify steps are configured to be skipped.");
 			return;
@@ -523,59 +449,28 @@ public class MinifyMojo extends AbstractMojo {
 		}
 	}
 
-	private void checkDeprecatedOptions() {
-		if (debug == null) {
-			debug = verbose;
-		} else {
-			getLog().warn(
-					"The option 'debug' is deprecated and will be removed on the next version. Use 'verbose' instead.");
-		}
-		if (linebreak == null) {
-			linebreak = yuiLineBreak;
-		} else {
-			getLog().warn(
-					"The option 'linebreak' is deprecated and will be removed on the next version. Use 'yuiLineBreak' instead.");
-		}
-		if (munge == null) {
-			munge = !yuiNoMunge;
-		} else {
-			getLog().warn(
-					"The option 'munge' is deprecated and will be removed on the next version. Use 'yuiNoMunge' instead.");
-		}
-		if (preserveAllSemiColons == null) {
-			preserveAllSemiColons = yuiPreserveSemicolons;
-		} else {
-			getLog().warn(
-					"The option 'preserveAllSemiColons' is deprecated and will be removed on the next version. Use 'yuiPreserveSemicolons' instead.");
-		}
-		if (disableOptimizations == null) {
-			disableOptimizations = yuiDisableOptimizations;
-		} else {
-			getLog().warn(
-					"The option 'disableOptimizations' is deprecated and will be removed on the next version. Use 'yuiDisableOptimizations' instead.");
-		}
-	}
-
 	private void fillOptionalValues() {
-		if (Strings.isNullOrEmpty(cssTargetDir)) {
+		if (Strings.isNullOrEmpty(cssTargetDir))
 			cssTargetDir = cssSourceDir;
-		}
-		if (Strings.isNullOrEmpty(jsTargetDir)) {
+
+		if (Strings.isNullOrEmpty(jsTargetDir))
 			jsTargetDir = jsSourceDir;
-		}
-		if (Strings.isNullOrEmpty(jsSourceIncludeDir)) {
+
+		if (Strings.isNullOrEmpty(jsSourceIncludeDir))
 			jsSourceIncludeDir = jsSourceDir;
-		}
-		if (Strings.isNullOrEmpty(cssSourceIncludeDir)) {
+
+		if (Strings.isNullOrEmpty(cssSourceIncludeDir))
 			cssSourceIncludeDir = cssSourceDir;
-		}
-		if (Strings.isNullOrEmpty(charset)) {
+
+		if (Strings.isNullOrEmpty(charset))
 			charset = Charset.defaultCharset().name();
-		}
+
+		if(debug)
+			verbose = true;
 	}
 
 	private YuiConfig fillYuiConfig() {
-		return new YuiConfig(linebreak, munge, preserveAllSemiColons, disableOptimizations);
+		return new YuiConfig(yuiLineBreak, yuiNoMunge, yuiPreserveSemicolons, yuiDisableOptimizations);
 	}
 
 	private ClosureConfig fillClosureConfig() {
@@ -583,60 +478,61 @@ public class MinifyMojo extends AbstractMojo {
 		dependencyOptions.setDependencySorting(closureSortDependencies);
 
 		List<SourceFile> externs = new ArrayList<>();
-		for (String extern : closureExterns) {
+		for (String extern : closureExterns)
 			externs.add(SourceFile.fromFile(webappSourceDir + File.separator + extern, Charset.forName(charset)));
-		}
 
 		return new ClosureConfig(closureLanguage, closureCompilationLevel, dependencyOptions, externs,
-				closureWarningLevels, closureUseDefaultExterns, closureCreateSourceMap, closureAngularPass);
+			closureWarningLevels, closureUseDefaultExterns, closureCreateSourceMap, closureAngularPass);
 	}
 
 	private Collection<ProcessFilesTask> createTasks(YuiConfig yuiConfig, ClosureConfig closureConfig)
-			throws MojoFailureException, FileNotFoundException {
+		throws MojoFailureException, FileNotFoundException {
 		List<ProcessFilesTask> tasks = newArrayList();
-
-		if (!Strings.isNullOrEmpty(bundleConfiguration)) { // If a bundleConfiguration is defined, attempt to use that
+		if (!Strings.isNullOrEmpty(bundleConfiguration)) {
 			AggregationConfiguration aggregationConfiguration;
 			try (Reader bundleConfigurationReader = new FileReader(bundleConfiguration)) {
 				aggregationConfiguration = new Gson().fromJson(bundleConfigurationReader,
-						AggregationConfiguration.class);
+					AggregationConfiguration.class);
 			} catch (IOException e) {
-				throw new MojoFailureException("Failed to open the bundle configuration file [" + bundleConfiguration
-						+ "].", e);
+				throw new MojoFailureException(
+					"Failed to open the bundle configuration file [" + bundleConfiguration + "].", e);
 			}
 
 			for (Aggregation aggregation : aggregationConfiguration.getBundles()) {
-				if (Aggregation.AggregationType.css.equals(aggregation.getType())) {
+				if (Aggregation.AggregationType.css.equals(aggregation.getType()))
 					tasks.add(createCSSTask(yuiConfig, closureConfig, aggregation.getFiles(),
-							Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
-				} else if (Aggregation.AggregationType.js.equals(aggregation.getType())) {
+						Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
+				else if (Aggregation.AggregationType.js.equals(aggregation.getType()))
 					tasks.add(createJSTask(yuiConfig, closureConfig, aggregation.getFiles(),
-							Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
-				}
+						Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
 			}
-		} else { // Otherwise, fallback to the default behavior
+		} else {
 			tasks.add(createCSSTask(yuiConfig, closureConfig, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
-					cssFinalFile));
-			tasks.add(createJSTask(yuiConfig, closureConfig, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
-					jsFinalFile));
+				cssFinalFile));
+			tasks.add(
+				createJSTask(yuiConfig, closureConfig, jsSourceFiles, jsSourceIncludes, jsSourceExcludes, jsFinalFile));
 		}
-
 		return tasks;
 	}
 
 	private ProcessFilesTask createCSSTask(YuiConfig yuiConfig, ClosureConfig closureConfig,
-			List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
-			String cssFinalFile) throws FileNotFoundException {
-		return new ProcessCSSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
-				webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
-				cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
+		List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
+		String cssFinalFile) throws FileNotFoundException {
+
+		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge,
+			skipMinify, webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles,
+			cssSourceIncludes, cssSourceExcludes, cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
+
+		return new ProcessCSSFilesTask(opt);
 	}
 
 	private ProcessFilesTask createJSTask(YuiConfig yuiConfig, ClosureConfig closureConfig, List<String> jsSourceFiles,
-			List<String> jsSourceIncludes, List<String> jsSourceExcludes, String jsFinalFile)
-					throws FileNotFoundException {
-		return new ProcessJSFilesTask(getLog(), debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify,
-				webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
-				jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
+		List<String> jsSourceIncludes, List<String> jsSourceExcludes, String jsFinalFile) throws FileNotFoundException {
+
+		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge,
+			skipMinify, webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles,
+			jsSourceIncludes, jsSourceExcludes, jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
+
+		return new ProcessJSFilesTask(opt);
 	}
 }
