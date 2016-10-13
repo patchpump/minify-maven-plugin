@@ -6,7 +6,7 @@ Under the hood, it uses the following compressors:
 
 - [YUI Compressor] (https://yui.github.com/yuicompressor)
 - [Google Closure Compiler] (https://github.com/google/closure-compiler)
-- [UglifyJS 2] (https://github.com/mishoo/UglifyJS2) (terribly slow byt procuces the smallest files)
+- [UglifyJS 2] (https://github.com/mishoo/UglifyJS2) (terribly slow but procuces the smallest files)
 
 ## Benefits
 
@@ -30,7 +30,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
     <plugin>
       <groupId>patchpump.minify</groupId>
       <artifactId>minify-maven-plugin</artifactId>
-      <version>2.7.5-PATCHPUMP-R5</version>
+      <version>2.8.0-PATCHPUMP-R0</version>
       <executions>
         <execution>
           <id>default-minify</id>
@@ -66,8 +66,7 @@ For more information, check https://github.com/patchpump/minify-maven-plugin
 
 ## System Requirements
   
-Since the version 1.7, Minify Maven Plugin requires Java 7 to run.  
-If you need to support older versions of Java please use the version 1.6 or bellow.
+Since the version 2.8.0-PATCHPUMP-R0, Minify Maven Plugin requires Java 8 to run.
 
 ## License
 

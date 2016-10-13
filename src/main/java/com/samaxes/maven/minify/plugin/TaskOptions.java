@@ -1,0 +1,154 @@
+package com.samaxes.maven.minify.plugin;
+
+import java.util.List;
+
+import org.apache.maven.plugin.logging.Log;
+
+import com.samaxes.maven.minify.common.ClosureConfig;
+import com.samaxes.maven.minify.common.YuiConfig;
+import com.samaxes.maven.minify.plugin.MinifyMojo.Engine;
+
+/**
+ * Task options with horrible constructors.
+ */
+public class TaskOptions {
+
+	public enum Type {
+		CSS, JS
+	}
+
+	final Log log;
+	final boolean verbose;
+	final boolean debug;
+	final Integer bufferSize;
+	final String charset;
+	final String suffix;
+	final boolean nosuffix;
+
+	final boolean skipMerge;
+	final boolean skipMinify;
+	final Engine engine;
+	final YuiConfig yuiConfig;
+	final String sourceDir;
+	final String sourceIncludeDir;
+	final String targetDir;
+	final String mergedFilename;
+	final String webappSourceDir;
+	final String webappTargetDir;
+	final List<String> sourceFiles;
+	final List<String> sourceIncludes;
+	final List<String> sourceExcludes;
+	final boolean gzip;
+	final Type type;
+	ClosureConfig closureConfig;
+
+	private TaskOptions(Log log, boolean verbose, boolean debug, Integer bufferSize, String charset, String suffix, boolean nosuffix,
+		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String sourceDir,
+		String sourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
+		String targetDir, String mergedFilename, Engine engine, YuiConfig yuiConfig, boolean gzip,
+		ClosureConfig closureConfig, Type type) {
+
+		this.log = log;
+		this.verbose = verbose;
+		this.debug = debug;
+		this.bufferSize = bufferSize;
+		this.charset = charset;
+		this.suffix = suffix;
+		this.nosuffix = nosuffix;
+		this.skipMerge = skipMerge;
+		this.skipMinify = skipMinify;
+		this.sourceDir = sourceDir;
+		this.sourceIncludeDir = sourceIncludeDir;
+		this.sourceFiles = sourceFiles;
+		this.sourceIncludes = sourceIncludes;
+		this.sourceExcludes = sourceExcludes;
+		this.targetDir = targetDir;
+		this.mergedFilename = mergedFilename;
+		this.webappSourceDir = webappSourceDir;
+		this.webappTargetDir = webappTargetDir;
+		this.engine = engine;
+		this.yuiConfig = yuiConfig;
+		this.gzip = gzip;
+		this.type = type;
+		this.closureConfig = closureConfig;
+	}
+
+	/**
+	 * CSS task options
+	 *
+	 * @param log Maven plugin log
+	 * @param verbose display additional info
+	 * @param bufferSize size of the buffer used to read source files
+	 * @param charset if a character set is specified, a byte-to-char variant allows the encoding to be selected.
+	 * @param suffix final file name suffix
+	 * @param nosuffix whether to use a suffix for the minified file name or not
+	 * @param skipMerge whether to skip the merge step or not
+	 * @param skipMinify whether to skip the minify step or not
+	 * @param webappSourceDir web resources source directory
+	 * @param webappTargetDir web resources target directory
+	 * @param inputDir directory containing source files
+	 * @param sourceFiles list of source files to include
+	 * @param sourceIncludes list of source files to include
+	 * @param sourceExcludes list of source files to exclude
+	 * @param outputDir directory to write the final file
+	 * @param outputFilename the output file name
+	 * @param engine minify processor engine selected
+	 * @param yuiConfig YUI Compressor configuration
+	 */
+	public TaskOptions(Log log, boolean verbose, boolean debug, Integer bufferSize, String charset, String suffix, boolean nosuffix,
+		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String cssSourceDir,
+		String cssSourceIncludeDir, List<String> cssSourceFiles, List<String> cssSourceIncludes,
+		List<String> cssSourceExcludes, String cssTargetDir, String cssFinalFile, Engine cssEngine, YuiConfig yuiConfig,
+		boolean gzip) {
+
+		this(log, verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
+			webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
+			cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip, null, Type.CSS);
+	}
+
+	/**
+	 * JS task options.
+	 * 
+	 * @param log Maven plugin log
+	 * @param verbose display additional info
+	 * @param bufferSize size of the buffer used to read source files
+	 * @param charset if a character set is specified, a byte-to-char variant allows the encoding to be selected.
+	 * @param suffix final file name suffix
+	 * @param nosuffix whether to use a suffix for the minified file name or not
+	 * @param skipMerge whether to skip the merge step or not
+	 * @param skipMinify whether to skip the minify step or not
+	 * @param webappSourceDir web resources source directory
+	 * @param webappTargetDir web resources target directory
+	 * @param inputDir directory containing source files
+	 * @param jsSourceIncludeDir directory containing source files to incolude
+	 * @param sourceFiles list of source files to include
+	 * @param sourceIncludes list of source files to include
+	 * @param sourceExcludes list of source files to exclude
+	 * @param outputDir directory to write the final file
+	 * @param outputFilename the output file name
+	 * @param engine minify processor engine selected
+	 * @param yuiConfig YUI Compressor configuration
+	 * @param closureConfig Google Closure Compiler configuration
+	 */
+	public TaskOptions(Log log, boolean verbose, boolean debug, int bufferSize, String charset, String suffix, boolean nosuffix,
+		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String jsSourceDir,
+		String jsSourceIncludeDir, List<String> jsSourceFiles, List<String> jsSourceIncludes,
+		List<String> jsSourceExcludes, String jsTargetDir, String jsFinalFile, Engine jsEngine, YuiConfig yuiConfig,
+		ClosureConfig closureConfig, boolean gzip) {
+
+		this(log, verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
+			webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
+			jsTargetDir, jsFinalFile, jsEngine, yuiConfig, gzip, closureConfig, Type.JS);
+	}
+
+	@Override
+	public String toString() {
+		return "TaskOptions [verbose=" + verbose + ", debug=" + debug + ", bufferSize=" + bufferSize + ", charset="
+			+ charset + ", suffix=" + suffix + ", nosuffix=" + nosuffix + ", skipMerge=" + skipMerge + ", skipMinify="
+			+ skipMinify + ", engine=" + engine + ", yuiConfig=" + yuiConfig + ", sourceDir=" + sourceDir
+			+ ", sourceIncludeDir=" + sourceIncludeDir + ", targetDir=" + targetDir + ", mergedFilename="
+			+ mergedFilename + ", webappSourceDir=" + webappSourceDir + ", webappTargetDir=" + webappTargetDir
+			+ ", sourceFiles=" + sourceFiles + ", sourceIncludes=" + sourceIncludes + ", sourceExcludes="
+			+ sourceExcludes + ", gzip=" + gzip + ", type=" + type + ", closureConfig=" + closureConfig + "]";
+	}
+}

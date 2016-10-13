@@ -33,113 +33,115 @@ import com.google.javascript.jscomp.SourceMap.Format;
  */
 public class ClosureConfig {
 
-    private final LanguageMode language;
-
-    private final CompilationLevel compilationLevel;
-
-    private final DependencyOptions dependencyOptions;
-
-    private final List<SourceFile> externs;
-
-    private final Boolean useDefaultExterns;
-
-    private final Format sourceMapFormat;
-
-    private final Boolean angularPass;
-
-    private Map<String,String> warningLevels;
+	private final LanguageMode language;
+	private final CompilationLevel compilationLevel;
+	private final DependencyOptions dependencyOptions;
+	private final List<SourceFile> externs;
+	private final Boolean useDefaultExterns;
+	private final Format sourceMapFormat;
+	private final Boolean angularPass;
+	private Map<String, String> warningLevels;
 
 	/**
-     * Init Closure Compiler values.
-     *
-     * @param language the version of ECMAScript used to report errors in the code
-     * @param compilationLevel the degree of compression and optimization to apply to JavaScript
-     * @param dependencyOptions options for how to manage dependencies between input files
-     * @param externs preserve symbols that are defined outside of the code you are compiling
-     * @param useDefaultExterns use default externs packed with the Closure Compiler
-     * @param createSourceMap create a source map for the minifed/combined production files
-     * @param angularPass use {@code @ngInject} annotation to generate Angular injections
-     */
-    public ClosureConfig(LanguageMode language, CompilationLevel compilationLevel, DependencyOptions dependencyOptions,
-            List<SourceFile> externs, Map<String,String> warningLevels, boolean useDefaultExterns, boolean createSourceMap, boolean angularPass) {
-        this.language = language;
-        this.compilationLevel = compilationLevel;
-        this.dependencyOptions = dependencyOptions;
-        this.externs = externs;
-        this.useDefaultExterns = useDefaultExterns;
-        this.sourceMapFormat = (createSourceMap) ? SourceMap.Format.V3 : null;
-        this.angularPass = angularPass;
-        this.warningLevels = warningLevels;
-    }
+	 * Init Closure Compiler values.
+	 *
+	 * @param language the version of ECMAScript used to report errors in the code
+	 * @param compilationLevel the degree of compression and optimization to apply to JavaScript
+	 * @param dependencyOptions options for how to manage dependencies between input files
+	 * @param externs preserve symbols that are defined outside of the code you are compiling
+	 * @param useDefaultExterns use default externs packed with the Closure Compiler
+	 * @param createSourceMap create a source map for the minifed/combined production files
+	 * @param angularPass use {@code @ngInject} annotation to generate Angular injections
+	 */
+	public ClosureConfig(LanguageMode language, CompilationLevel compilationLevel, DependencyOptions dependencyOptions,
+		List<SourceFile> externs, Map<String, String> warningLevels, boolean useDefaultExterns, boolean createSourceMap,
+		boolean angularPass) {
+		this.language = language;
+		this.compilationLevel = compilationLevel;
+		this.dependencyOptions = dependencyOptions;
+		this.externs = externs;
+		this.useDefaultExterns = useDefaultExterns;
+		this.sourceMapFormat = (createSourceMap) ? SourceMap.Format.V3 : null;
+		this.angularPass = angularPass;
+		this.warningLevels = warningLevels;
+	}
 
-    /**
-     * Gets the language.
-     *
-     * @return the language
-     */
-    public LanguageMode getLanguage() {
-        return language;
-    }
+	/**
+	 * Gets the language.
+	 *
+	 * @return the language
+	 */
+	public LanguageMode getLanguage() {
+		return language;
+	}
 
-    /**
-     * Gets the compilationLevel.
-     *
-     * @return the compilationLevel
-     */
-    public CompilationLevel getCompilationLevel() {
-        return compilationLevel;
-    }
+	/**
+	 * Gets the compilationLevel.
+	 *
+	 * @return the compilationLevel
+	 */
+	public CompilationLevel getCompilationLevel() {
+		return compilationLevel;
+	}
 
-    /**
-     * Gets the dependencyOptions.
-     *
-     * @return the dependencyOptions
-     */
-    public DependencyOptions getDependencyOptions() {
-        return dependencyOptions;
-    }
+	/**
+	 * Gets the dependencyOptions.
+	 *
+	 * @return the dependencyOptions
+	 */
+	public DependencyOptions getDependencyOptions() {
+		return dependencyOptions;
+	}
 
-    /**
-     * Gets the externs.
-     *
-     * @return the externs
-     */
-    public List<SourceFile> getExterns() {
-        return externs;
-    }
+	/**
+	 * Gets the externs.
+	 *
+	 * @return the externs
+	 */
+	public List<SourceFile> getExterns() {
+		return externs;
+	}
 
-    /**
-     * Gets the useDefaultExterns.
-     *
-     * @return the useDefaultExterns
-     */
-    public Boolean getUseDefaultExterns() {
-        return useDefaultExterns;
-    }
+	/**
+	 * Gets the useDefaultExterns.
+	 *
+	 * @return the useDefaultExterns
+	 */
+	public Boolean getUseDefaultExterns() {
+		return useDefaultExterns;
+	}
 
-    /**
-     * Gets the sourceMapFormat.
-     *
-     * @return the sourceMapFormat
-     */
-    public Format getSourceMapFormat() {
-        return sourceMapFormat;
-    }
+	/**
+	 * Gets the sourceMapFormat.
+	 *
+	 * @return the sourceMapFormat
+	 */
+	public Format getSourceMapFormat() {
+		return sourceMapFormat;
+	}
 
-    /**
-     * Gets the angularPass.
-     *
-     * @return the angularPass
-     */
-    public Boolean getAngularPass() {
-        return angularPass;
-    }
+	/**
+	 * Gets the angularPass.
+	 *
+	 * @return the angularPass
+	 */
+	public Boolean getAngularPass() {
+		return angularPass;
+	}
 
-	public Map<String,String> getWarningLevels() {
+	public Map<String, String> getWarningLevels() {
 		return warningLevels;
 	}
 
 	public void setWarningLevels(Map<String, String> warningLevels) {
 		this.warningLevels = warningLevels;
+	}
+
+	@Override
+	public String toString() {
+		return "ClosureConfig [language=" + language + ", compilationLevel=" + compilationLevel + ", dependencyOptions="
+			+ dependencyOptions + ", externs=" + externs + ", useDefaultExterns=" + useDefaultExterns
+			+ ", sourceMapFormat=" + sourceMapFormat + ", angularPass=" + angularPass + ", warningLevels="
+			+ warningLevels + "]";
 	}
 }
