@@ -56,12 +56,13 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 	protected void minify(File mergedFile, File minifiedFile) throws IOException {
 
 		minifiedFile.getParentFile().mkdirs();
+		File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
+		OutputStream out = new FileOutputStream(minifiedFile);
 		try (InputStream in = new FileInputStream(mergedFile);
-			OutputStream out = new FileOutputStream(minifiedFile);
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
 			OutputStreamWriter writer = new OutputStreamWriter(out, opt.charset)) {
 
-			log.info("Creating the minified file [" + ((opt.verbose) ? minifiedFile.getPath() : minifiedFile.getName()) + "].");
+			log.info("Creating minified file [" + ((opt.verbose) ? minifiedFile.getPath() : minifiedFile.getName()) + "].");
 
 			switch (opt.engine) {
 			case YUI:
@@ -74,11 +75,19 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 				log.warn("CSS engine not supported.");
 				break;
 			}
-		} catch (IOException e) {
-			log.error("Failed to compress the CSS file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
-			throw e;
-		}
+		
+			if (opt.gzip)
+				gzip(minifiedFile, compressedFile);
 
-		gzip(mergedFile, minifiedFile);
+		} catch (Exception e) {
+			close(out);
+			minifiedFile.delete();
+			compressedFile.delete();
+			log.error("Failed to compress the CSS file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
+			throw new IOException(e);
+
+		} finally {
+			close(out);
+		}
 	}
 }

@@ -45,6 +45,7 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.samaxes.maven.minify.common.JavaScriptErrorReporter;
 import com.samaxes.maven.minify.common.UglifyJS2Compiler;
+import com.samaxes.maven.minify.common.UglifyJS3Compiler;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 /**
@@ -75,8 +76,9 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 
 		minifiedFile.getParentFile().mkdirs();
 
+		File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
+		OutputStream out = new FileOutputStream(minifiedFile);
 		try (InputStream in = new FileInputStream(mergedFile);
-			OutputStream out = new FileOutputStream(minifiedFile);
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
 			OutputStreamWriter writer = new OutputStreamWriter(out, opt.charset)) {
 
@@ -84,7 +86,6 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 
 			switch (opt.engine) {
 			case CLOSURE:
-				log.debug("Using Google Closure Compiler engine.");
 				Compiler compiler = new Compiler();
 				CompilerOptions options = new CompilerOptions();
 				opt.closureConfig.getCompilationLevel().setOptionsForCompilationLevel(options);
@@ -137,38 +138,45 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 				break;
 
 			case YUI:
-				log.debug("Using YUI Compressor engine.");
-				JavaScriptCompressor compressor = new JavaScriptCompressor(reader,
-					new JavaScriptErrorReporter(log, mergedFile.getName()));
+				JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new JavaScriptErrorReporter(log, mergedFile.getName()));
 				compressor.compress(writer, opt.yuiConfig.getLineBreak(), opt.yuiConfig.isMunge(), opt.verbose,
 					opt.yuiConfig.isPreserveSemicolons(), opt.yuiConfig.isDisableOptimizations());
 				break;
 
+			case UGLIFY2:
+				new UglifyJS2Compiler().compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
+				break;
+
 			case UGLIFY:
-				log.debug("Using UglifyJS 2 engine.");
-				UglifyJS2Compiler uglifier = new UglifyJS2Compiler();
-				uglifier.compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
+			case UGLIFY3:
+				new UglifyJS3Compiler().compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
 				break;
 
 			default:
 				log.warn("JavaScript engine [" + opt.engine + "] not supported.");
 				break;
 			}
-		} catch (Exception e) {
-			log.error("Failed to compress the JavaScript file ["
-				+ ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
-			throw new IOException(e);
-		}
 
-		gzip(mergedFile, minifiedFile);
+			if (opt.gzip)
+				gzip(minifiedFile, compressedFile);
+
+		} catch (Exception e) {
+			close(out);
+			minifiedFile.delete();
+			compressedFile.delete();
+			log.error("Failed to compress the JavaScript file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
+			throw new IOException(e);
+
+		} finally {
+			close(out);
+		}
 	}
 
 	private void flushSourceMap(File sourceMapOutputFile, String minifyFileName, SourceMap sourceMap) {
 		try (FileWriter out = new FileWriter(sourceMapOutputFile)) {
 			sourceMap.appendTo(out, minifyFileName);
 		} catch (IOException e) {
-			log.error("Failed to write the JavaScript Source Map file ["
-				+ ((opt.verbose) ? sourceMapOutputFile.getPath() : sourceMapOutputFile.getName()) + "].", e);
+			log.error("Failed to write the JavaScript Source Map file [" + sourceMapOutputFile.getName() + "].", e);
 		}
 	}
 }

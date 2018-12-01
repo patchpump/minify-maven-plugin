@@ -1,54 +1,34 @@
 package com.samaxes.maven.minify.common;
 
-import org.apache.commons.io.IOUtils;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URL;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import org.apache.commons.io.IOUtils;
 
 /**
- * Based on DustCompiler from https://github.com/patchpump/dustjs-maven-plugin
+ * UglifyJS 2 compiler.
+ * 
+ * @author patchpump
  */
-public class UglifyJS2Compiler {
-
-	private ScriptEngineManager mgr = new ScriptEngineManager();
-	private ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
-
-	Invocable invocable;
-
-	String dustFilename = "META-INF/uglifyjs/uglifyjs-min-2.7.3.js";
+public class UglifyJS2Compiler extends AbstractJavaScriptCompiler {
 
 	public UglifyJS2Compiler() throws IOException, ScriptException {
-
-		ClassLoader loader = getClass().getClassLoader();
-		URL resource = loader.getResource(dustFilename);
-
-		try (InputStreamReader inputStreamReader = new InputStreamReader(resource.openConnection().getInputStream())) {
-			jsEngine.eval(inputStreamReader);
-			invocable = (Invocable) jsEngine;
-		}
+		super("/META-INF/uglifyjs/uglifyjs-min-2.7.3.js");
 	}
 
+	@Override
 	public String compile(InputStreamReader reader) throws IOException, ScriptException, NoSuchMethodException {
-
 		String source = IOUtils.toString(reader);
-		Object scopeObject = getScopeObjectFromEngine();
-		Object[] params = new Object[] { source };
-		return (String) invocable.invokeMethod(scopeObject, "uglify", params);
-	}
-
-	private Object getScopeObjectFromEngine() {
-		return jsEngine.get("uglifier");
-	}
-
-	public void compile(InputStreamReader reader, OutputStreamWriter writer,
-		JavaScriptErrorReporter javaScriptErrorReporter) throws NoSuchMethodException, IOException, ScriptException {
-		writer.write(compile(reader));
+		synchronized(script) {
+			ScriptEngine engine = script.getEngine();
+			Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+			bindings.put("input", source);
+			return (String)engine.eval("uglifysmth()", bindings);
+		}
 	}
 }

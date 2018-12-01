@@ -6,7 +6,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import com.samaxes.maven.minify.common.ClosureConfig;
 import com.samaxes.maven.minify.common.YuiConfig;
-import com.samaxes.maven.minify.plugin.MinifyMojo.Engine;
+import com.samaxes.maven.minify.plugin.AbstractMinifyMojo.Engine;
 
 /**
  * Task options with horrible constructors.
