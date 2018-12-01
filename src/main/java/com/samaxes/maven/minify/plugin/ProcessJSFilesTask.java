@@ -39,6 +39,8 @@ import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticGroup;
+import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.samaxes.maven.minify.common.JavaScriptErrorReporter;
@@ -78,11 +80,12 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
 			OutputStreamWriter writer = new OutputStreamWriter(out, opt.charset)) {
 
-			log.info("Creating the minified file [" + ((opt.verbose) ? minifiedFile.getPath() : minifiedFile.getName()) + "].");
+			log.info("Creating the minified file [" + ((opt.verbose) ? minifiedFile.getPath() : minifiedFile.getName()) + "] using [" + opt.engine + "] engine.");
 
 			switch (opt.engine) {
 			case CLOSURE:
 				log.debug("Using Google Closure Compiler engine.");
+				Compiler compiler = new Compiler();
 				CompilerOptions options = new CompilerOptions();
 				opt.closureConfig.getCompilationLevel().setOptionsForCompilationLevel(options);
 				options.setOutputCharset(Charset.forName(opt.charset));
@@ -90,10 +93,15 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 				options.setAngularPass(opt.closureConfig.getAngularPass());
 				options.setDependencyOptions(opt.closureConfig.getDependencyOptions());
 				if (opt.closureConfig.getWarningLevels() != null) {
+					DiagnosticGroups diagnosticGroups = compiler.getDiagnosticGroups();
 					for (Entry<String, String> entry : opt.closureConfig.getWarningLevels().entrySet()) {
 						String groupName = entry.getKey();
 						String levelName = entry.getValue();
-						options.setWarningLevel(groupName, CheckLevel.valueOf(levelName));
+						DiagnosticGroup diagnosticGroup = diagnosticGroups.forName(groupName);
+						if (diagnosticGroup != null)
+							options.setWarningLevel(diagnosticGroup, CheckLevel.valueOf(levelName));
+						else
+							log.warn("Unsupported diagnostic group [" + groupName + "] ignored.");
 					}
 				}
 
@@ -109,7 +117,6 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 					externs.addAll(CommandLineRunner.getDefaultExterns());
 				}
 
-				Compiler compiler = new Compiler();
 				compiler.compile(externs, Lists.newArrayList(input), options);
 
 				if (compiler.hasErrors())
