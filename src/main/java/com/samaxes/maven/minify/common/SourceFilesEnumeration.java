@@ -47,10 +47,11 @@ public class SourceFilesEnumeration implements Enumeration<InputStream> {
 	 */
 	public SourceFilesEnumeration(Log log, List<File> files, boolean verbose) {
 		this.files = files;
-
-		for (File file : files) {
-			log.info("Processing source file [" + ((verbose) ? file.getPath() : file.getName()) + "].");
-		}
+		if (!verbose)
+			return;
+		
+		for (File file : files)
+			log.info("Processing source file [" + file.getName() + "].");
 	}
 
 	/**

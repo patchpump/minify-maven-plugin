@@ -207,7 +207,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 */
 	private void mergeFiles(File targetFile) throws IOException {
 		
-		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceLastModified) {
+		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceLastModified && targetFile.length() > 0) {
 			if (opt.verbose)
 				log.info("Skipping as [" + targetFile + "] is up to date.");
 			return;
@@ -234,7 +234,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 */
 	private void minifyFile(File sourceFile, File targetFile) throws IOException {
 
-		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceFile.lastModified()) {
+		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceFile.lastModified() && targetFile.length() > 0) {
 			if (opt.verbose)
 				log.info("Skipping as [" + sourceFile + "] is up to date.");
 			return;
@@ -252,29 +252,28 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	abstract void minify(File sourceFile, File targetFile) throws IOException;
 
 	/**
-	 * Compress the minifed target file.
-	 *
-	 * @param mergedFile input file resulting from the merged step
-	 * @param minifiedFile output file resulting from the minify step
+	 * Gzip file.
+	 * 
+	 * @param source source file
+	 * @param target target file
 	 */
-	void gzip(File mergedFile, File minifiedFile) {
-		if (!opt.gzip)
-			return;
+	protected void gzip(File source, File target) throws IOException {
+		try (InputStream in = new FileInputStream(source);
+			OutputStream out = new FileOutputStream(target);
+			GZIPOutputStream outGZIP = new GZIPOutputStream(out)) {
+			IOUtil.copy(in, outGZIP, opt.bufferSize);
+		}
+	}
 
+	/**
+	 * Quietly close stream.
+	 * 
+	 * @param stream stream to close
+	 */
+	protected void close(OutputStream stream) {
 		try {
-			File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
-			try (InputStream in = new FileInputStream(minifiedFile);
-				OutputStream out = new FileOutputStream(compressedFile);
-				GZIPOutputStream outGZIP = new GZIPOutputStream(out)) {
-				IOUtil.copy(in, outGZIP, opt.bufferSize);
-			}
-
-			log.info("Uncompressed size: " + mergedFile.length() + " bytes.");
-			log.info("Compressed size: " + minifiedFile.length() + " bytes minified (" + compressedFile.length()
-				+ " bytes gzipped).");
-
-		} catch (IOException e) {
-			log.debug("Failed to calculate the gzipped file size.", e);
+			stream.close();
+		} catch(Exception ignore) {
 		}
 	}
 
