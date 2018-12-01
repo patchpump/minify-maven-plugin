@@ -37,7 +37,6 @@ public abstract class AbstractJavaScriptCompiler {
 			return;
 		}
 
-		System.out.println("Creating compiler..");
 		try (InputStreamReader inputStreamReader = new InputStreamReader(AbstractJavaScriptCompiler.class.getResourceAsStream(engineFile), StandardCharsets.UTF_8)) {
 			compiled = ((Compilable)scriptEngine).compile(inputStreamReader);
 			Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -45,7 +44,6 @@ public abstract class AbstractJavaScriptCompiler {
 			CompiledScript cached = scriptCache.putIfAbsent(engineFile, compiled);
 			script = cached != null ? cached : compiled;
 		}
-		System.out.println("Created compiler..");
 	}
 
 	protected abstract String compile(InputStreamReader reader) throws IOException, ScriptException, NoSuchMethodException;
