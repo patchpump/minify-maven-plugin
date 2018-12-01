@@ -1,5 +1,12 @@
 # Minify Maven Plugin
 
+## 2.8.0-patchpump-R1
+
+* Default closureLanguage is now ECMASCRIPT5
+* Update Google Closure Compiler to v20181125
+* Update yuicompressor to 2.4.8
+* Update maven-plugin-annotations to allow for ASM 5+ and OpenJDK 10
+
 ## 2.8.0-patchpump-R0
 
 * Fix relative path issue on linux
