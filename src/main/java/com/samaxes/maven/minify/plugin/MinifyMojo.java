@@ -77,6 +77,12 @@ public class MinifyMojo extends AbstractMojo {
 	private boolean debug;
 
 	/**
+	 * Display even more additional informational messages.
+	 */
+	@Parameter(property = "incrementalBuild", defaultValue = "true")
+	private boolean incrementalBuild;
+
+	/**
 	 * Size of the buffer used to read source files.
 	 */
 	@Parameter(property = "bufferSize", defaultValue = "4096")
@@ -520,7 +526,7 @@ public class MinifyMojo extends AbstractMojo {
 		List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
 		String cssFinalFile) throws FileNotFoundException {
 
-		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge,
+		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
 			skipMinify, webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles,
 			cssSourceIncludes, cssSourceExcludes, cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
 
@@ -530,7 +536,7 @@ public class MinifyMojo extends AbstractMojo {
 	private ProcessFilesTask createJSTask(YuiConfig yuiConfig, ClosureConfig closureConfig, List<String> jsSourceFiles,
 		List<String> jsSourceIncludes, List<String> jsSourceExcludes, String jsFinalFile) throws FileNotFoundException {
 
-		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, bufferSize, charset, suffix, nosuffix, skipMerge,
+		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
 			skipMinify, webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles,
 			jsSourceIncludes, jsSourceExcludes, jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
 

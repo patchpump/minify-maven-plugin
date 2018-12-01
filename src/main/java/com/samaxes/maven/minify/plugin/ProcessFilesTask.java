@@ -54,9 +54,11 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	final File targetDir;
 	final File sourceIncludeDir;
 	final List<File> files = new ArrayList<>();
+
+	final long sourceLastModified;
 	final boolean sourceFilesEmpty;
 	final boolean sourceIncludesEmpty;
-
+	
 	final TaskOptions opt;
 
 	/**
@@ -91,6 +93,14 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 
 		this.sourceFilesEmpty = opt.sourceFiles.isEmpty();
 		this.sourceIncludesEmpty = opt.sourceIncludes.isEmpty();
+		
+		long max = 0;
+		for (File file : files) {
+			long lastModified = file.lastModified();
+			if (lastModified > max)
+				max = lastModified;
+		}
+		sourceLastModified = max;
 	}
 
 	private File appendRelativePath(String base, String relative) {
@@ -107,89 +117,139 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 */
 	@Override
 	public Object call() throws IOException {
-
 		synchronized (log) {
-			log.info("");
-			if(opt.debug)
-				log.info("Skip steps:" + opt.skipMerge + " " + opt.skipMinify);
-			
-			String sourceBasePath = sourceDir.getAbsolutePath();
-
-			if (!files.isEmpty() && (targetDir.exists() || targetDir.mkdirs())) {
-				if (opt.skipMerge) {
-					log.info("Starting " + opt.type + " [minify] task:");
-					for (File file : files) {
-						String fileName = file.getName();
-						String baseName = FileUtils.basename(file.getName());
-						String extension = FileUtils.getExtension(file.getName());
-						String originalPath = file.getAbsolutePath();
-						String subPath = originalPath.substring(sourceBasePath.length(), originalPath.lastIndexOf(File.separator));
-
-						File targetPath = new File(targetDir, subPath);
-						targetPath.mkdirs();
-
-						File minifiedFile = new File(targetPath, (opt.nosuffix) ? fileName : baseName + opt.suffix + "." + extension);
-						minify(file, minifiedFile);
-					}
-
-				} else if (opt.skipMinify) {
-					log.info("Starting " + opt.type + " [merge] task:");
-					File mergedFile = new File(targetDir, opt.mergedFilename);
-					merge(mergedFile);
-
-				} else {
-					log.info("Starting " + opt.type + " [merge, minify] task:");
-					File mergedFile = new File(targetDir, (opt.nosuffix) ? opt.mergedFilename + TEMP_SUFFIX : opt.mergedFilename);
-					File taretFile = new File(targetDir, opt.mergedFilename);
-					String extension = FileUtils.getExtension(taretFile.getName());
-					String baseName = FileUtils.basename(taretFile.getName());
-					File minifiedFile = new File(taretFile.getParentFile(), (opt.nosuffix) ? opt.mergedFilename : baseName + opt.suffix + "." + extension);
-					if(opt.debug) {
-						log.info("targetDir: " + targetDir);
-						log.info("mergedFilename: " + opt.mergedFilename);
-						log.info("mergedFile: " + mergedFile);
-						log.info("minifiedFile: " + minifiedFile);
-					}
-					merge(mergedFile);
-					minify(mergedFile, minifiedFile);
-					if (opt.nosuffix) {
-						if (!mergedFile.delete())
-							mergedFile.deleteOnExit();
-					}
-				}
-
-			} else if (!sourceFilesEmpty || !sourceIncludesEmpty) {
-				log.error("No valid " + opt.type + " source files found to process.");
-			}
+			callSyncronous();
 		}
 		return null;
 	}
+	
+	private void callSyncronous() throws IOException {
+
+		long started = System.currentTimeMillis();
+		
+		if (files.isEmpty()) {
+			if (opt.verbose)
+				log.info("No source files to process.");
+			return;
+		}
+
+		if (!targetDir.exists() && !targetDir.mkdirs())
+			throw new IOException("failed to create target directory " + targetDir);
+
+		if (opt.skipMerge) {
+			if (opt.verbose)
+				log.info("Starting " + opt.type + " [minify] task for " + files.size() + " files in [" + sourceDir + "]");
+			else
+				log.info("Starting " + opt.type + " [minify] task.");
+				
+			String sourceBasePath = sourceDir.getAbsolutePath();
+
+			for (File file : files) {
+				String fileName = file.getName();
+				String baseName = FileUtils.basename(file.getName());
+				String extension = FileUtils.getExtension(file.getName());
+				String originalPath = file.getAbsolutePath();
+				String subPath = originalPath.substring(sourceBasePath.length(), originalPath.lastIndexOf(File.separator));
+
+				File targetPath = new File(targetDir, subPath);
+				targetPath.mkdirs();
+
+				File targetFile = new File(targetPath, (opt.nosuffix) ? fileName : baseName + opt.suffix + "." + extension);
+				minifyFile(file, targetFile);
+			}
+			return;
+		}
+
+		if (opt.skipMinify) {
+			if (opt.verbose)
+				log.info("Starting " + opt.type + " [merge] task for " + files.size() + " files in [" + sourceDir + "]");
+			else
+				log.info("Starting " + opt.type + " [merge] task.");
+				
+			File mergedFile = new File(targetDir, opt.mergedFilename);
+			mergeFiles(mergedFile);
+			return;
+		}
+
+		if (opt.verbose)
+			log.info("Starting " + opt.type + " [merge, minify] task for " + files.size() + " files in [" + sourceDir + "]");
+		else
+			log.info("Starting " + opt.type + " [merge, minify] task.");
+			
+		File mergedFile = new File(targetDir, (opt.nosuffix) ? opt.mergedFilename + TEMP_SUFFIX : opt.mergedFilename);
+		File taretFile = new File(targetDir, opt.mergedFilename);
+		String extension = FileUtils.getExtension(taretFile.getName());
+		String baseName = FileUtils.basename(taretFile.getName());
+		File minifiedFile = new File(taretFile.getParentFile(), (opt.nosuffix) ? opt.mergedFilename : baseName + opt.suffix + "." + extension);
+		if(opt.debug) {
+			log.info("targetDir: " + targetDir);
+			log.info("mergedFilename: " + opt.mergedFilename);
+			log.info("mergedFile: " + mergedFile);
+			log.info("minifiedFile: " + minifiedFile);
+		}
+		
+		mergeFiles(mergedFile);
+		minifyFile(mergedFile, minifiedFile);
+		
+		if (opt.nosuffix) {
+			if (!mergedFile.delete())
+				mergedFile.deleteOnExit();
+		}
+		
+		log.info("Task finished in " + (System.currentTimeMillis() - started) + " ms.");
+	}
 
 	/**
-	 * Merges a list of source files. Create missing parent directories if needed.
+	 * Merges source files into given target. Create missing parent directories if needed.
 	 *
 	 * @param mergedFile output file resulting from the merged step
-	 * @throws IOException when the merge step fails
+	 * @throws IOException if the merge step fails
 	 */
-	protected void merge(File mergedFile) throws IOException {
-		mergedFile.getParentFile().mkdirs();
-		try (InputStream sequence = new SequenceInputStream(new SourceFilesEnumeration(log, files, opt.verbose));
-			OutputStream out = new FileOutputStream(mergedFile);
+	private void mergeFiles(File targetFile) throws IOException {
+		
+		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceLastModified) {
+			if (opt.verbose)
+				log.info("Skipping as [" + targetFile + "] is up to date.");
+			return;
+		}
+
+		targetFile.getParentFile().mkdirs();
+		SourceFilesEnumeration source = new SourceFilesEnumeration(log, files, opt.verbose);
+		try (InputStream sequence = new SequenceInputStream(source)) {
 			InputStreamReader sequenceReader = new InputStreamReader(sequence, opt.charset);
-			OutputStreamWriter outWriter = new OutputStreamWriter(out, opt.charset)) {
-			log.info("Creating the merged file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].");
-			IOUtil.copy(sequenceReader, outWriter, opt.bufferSize);
+			try (OutputStream out = new FileOutputStream(targetFile)) {
+				OutputStreamWriter outWriter = new OutputStreamWriter(out, opt.charset);
+				log.info("Creating merged file [" + ((opt.verbose) ? targetFile.getPath() : targetFile.getName()) + "].");
+				IOUtil.copy(sequenceReader, outWriter, opt.bufferSize);
+			}
 		}
 	}
 
 	/**
+	 * Minifies a source file. Checks for incremental build.
+	 *
+	 * @param sourceFile input file resulting from the merged step
+	 * @param targetFile output file resulting from the minify step
+	 * @throws IOException if the minify step fails
+	 */
+	private void minifyFile(File sourceFile, File targetFile) throws IOException {
+
+		if (opt.incrementalBuild && targetFile.exists() && targetFile.lastModified() > sourceFile.lastModified()) {
+			if (opt.verbose)
+				log.info("Skipping as [" + sourceFile + "] is up to date.");
+			return;
+		}
+		minify(sourceFile, targetFile);
+	}
+	
+	/**
 	 * Minifies a source file. Create missing parent directories if needed.
 	 *
-	 * @param mergedFile input file resulting from the merged step
-	 * @param minifiedFile output file resulting from the minify step
-	 * @throws IOException when the minify step fails
+	 * @param sourceFile input file resulting from the merged step
+	 * @param targetFile output file resulting from the minify step
+	 * @throws IOException if the minify step fails
 	 */
-	abstract void minify(File mergedFile, File minifiedFile) throws IOException;
+	abstract void minify(File sourceFile, File targetFile) throws IOException;
 
 	/**
 	 * Compress the minifed target file.
@@ -197,7 +257,6 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * @param mergedFile input file resulting from the merged step
 	 * @param minifiedFile output file resulting from the minify step
 	 */
-
 	void gzip(File mergedFile, File minifiedFile) {
 		if (!opt.gzip)
 			return;
