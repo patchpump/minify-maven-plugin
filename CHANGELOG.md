@@ -1,13 +1,17 @@
 # Minify Maven Plugin
 
-## 2.8.0-patchpump-R1
+## 2.8.0-PATCHPUMP-R2
+
+* Add incrementalBuild property for source file change detection
+
+## 2.8.0-PATCHPUMP-R1
 
 * Default closureLanguage is now ECMASCRIPT5
 * Update Google Closure Compiler to v20181125
 * Update yuicompressor to 2.4.8
 * Update maven-plugin-annotations to allow for ASM 5+ and OpenJDK 10
 
-## 2.8.0-patchpump-R0
+## 2.8.0-PATCHPUMP-R0
 
 * Fix relative path issue on linux
 * Remove default paths, paths now relative to webapp dir
@@ -16,17 +20,17 @@
 * Update uglifyjs to 2.7.3
 * Require Java 8
 
-## 2.7.5-patchpump-R5
+## 2.7.5-PATCHPUMP-R5
 
 * Add `closureWarningLevels` option
 * Update Google Closure Compiler to v20151015
 
-## 2.7.5-patchpump-R4
+## 2.7.5-PATCHPUMP-R4
 
 * Add UGLIFY engine (terribly slow)
 * Update Google Closure Compiler to v20150609
 
-## 2.7.5-patchpump-R3
+## 2.7.5-PATCHPUMP-R3
 
 * Add `cssSourceIncludeDir` and `jsSourceIncludeDir` options
 * Add `gzip` option for leaving zipped file
