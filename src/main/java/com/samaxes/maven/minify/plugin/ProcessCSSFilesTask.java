@@ -76,8 +76,7 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 				break;
 			}
 		
-			if (opt.gzip)
-				gzip(minifiedFile, compressedFile);
+			writer.flush();
 
 		} catch (Exception e) {
 			close(out);
@@ -89,5 +88,8 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 		} finally {
 			close(out);
 		}
+
+		if (opt.gzip)
+			gzip(minifiedFile, compressedFile);
 	}
 }
