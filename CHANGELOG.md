@@ -1,5 +1,10 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R6
+
+* Update Google Closure Compiler to v20200517
+* Update UglifyJS 3 to v3.9.4
+
 ## 2.8.0-PATCHPUMP-R4
 
 * Add UglifyJS 3

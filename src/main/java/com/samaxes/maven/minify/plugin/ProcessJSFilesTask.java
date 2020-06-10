@@ -57,7 +57,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 	 * Task constructor.
 	 *
 	 * @param opt task options
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public ProcessJSFilesTask(final TaskOptions opt) throws FileNotFoundException {
 		super(opt);
@@ -94,11 +94,10 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 				options.setAngularPass(opt.closureConfig.getAngularPass());
 				options.setDependencyOptions(opt.closureConfig.getDependencyOptions());
 				if (opt.closureConfig.getWarningLevels() != null) {
-					DiagnosticGroups diagnosticGroups = compiler.getDiagnosticGroups();
 					for (Entry<String, String> entry : opt.closureConfig.getWarningLevels().entrySet()) {
 						String groupName = entry.getKey();
 						String levelName = entry.getValue();
-						DiagnosticGroup diagnosticGroup = diagnosticGroups.forName(groupName);
+						DiagnosticGroup diagnosticGroup = DiagnosticGroups.forName(groupName);
 						if (diagnosticGroup != null)
 							options.setWarningLevel(diagnosticGroup, CheckLevel.valueOf(levelName));
 						else
@@ -121,7 +120,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 				compiler.compile(externs, Lists.newArrayList(input), options);
 
 				if (compiler.hasErrors())
-					throw new EvaluatorException(compiler.getErrors()[0].description);
+					throw new EvaluatorException(compiler.getErrors().get(0).getDescription());
 
 				writer.append(compiler.toSource());
 
