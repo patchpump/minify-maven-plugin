@@ -12,11 +12,12 @@ import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
 /**
- * Uses the JavaScript ScriptEngine still present in JDK 10 to run compilers.
+ * JavaScriptCompiler backed by Nashorn.
  * 
  * NOTE: not thread-safe as compiler source is only evaluated once and bindings is re-used
  * 
@@ -24,7 +25,7 @@ import javax.script.ScriptException;
  */
 public abstract class AbstractJavaScriptCompiler {
 
-	private static final ScriptEngine scriptEngine = new ScriptEngineManager(null).getEngineByName("JavaScript");
+	private static final ScriptEngine scriptEngine = new NashornScriptEngineFactory().getScriptEngine();
 	private static final Map<String,CompiledScript> scriptCache = new ConcurrentHashMap<>();
 
 	protected final CompiledScript script;
