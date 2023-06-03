@@ -9,10 +9,10 @@ import java.util.Map;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import com.google.common.base.Strings;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.DependencyOptions;
 import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.jarjar.com.google.common.base.Strings;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.samaxes.maven.minify.common.ClosureConfig;
 import com.samaxes.maven.minify.common.YuiConfig;

@@ -18,8 +18,6 @@
  */
 package com.samaxes.maven.minify.plugin;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,8 +35,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.google.javascript.jscomp.jarjar.com.google.common.base.Strings;
+import com.google.javascript.jscomp.jarjar.com.google.common.collect.Lists;
 import com.samaxes.maven.minify.common.Aggregation;
 import com.samaxes.maven.minify.common.AggregationConfiguration;
 import com.samaxes.maven.minify.common.ClosureConfig;
@@ -91,7 +90,7 @@ public class MinifyMojo extends AbstractMinifyMojo {
 
 	private Collection<ProcessFilesTask> createTasks(YuiConfig yuiConfig, ClosureConfig closureConfig)
 		throws MojoFailureException, FileNotFoundException {
-		List<ProcessFilesTask> tasks = newArrayList();
+		List<ProcessFilesTask> tasks = Lists.newArrayList();
 		if (!Strings.isNullOrEmpty(bundleConfiguration)) {
 			AggregationConfiguration aggregationConfiguration;
 			try (Reader bundleConfigurationReader = new FileReader(bundleConfiguration)) {
