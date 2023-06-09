@@ -1,5 +1,9 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R10
+
+* Add plexus-utils dependency for Maven 3.9
+
 ## 2.8.0-PATCHPUMP-R7
 
 * Add Nashorn 15.4 for JDK 17

@@ -30,7 +30,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
     <plugin>
       <groupId>patchpump.minify</groupId>
       <artifactId>minify-maven-plugin</artifactId>
-      <version>2.8.0-PATCHPUMP-R7</version>
+      <version>2.8.0-PATCHPUMP-10</version>
       <executions>
         <execution>
           <id>default-minify</id>
@@ -66,7 +66,6 @@ For more information, check https://github.com/patchpump/minify-maven-plugin
 
 ## System Requirements
   
-Since version 2.8.0-PATCHPUMP-R0, Minify Maven Plugin requires JDK 8 to run.
 Since version 2.8.0-PATCHPUMP-R7, Minify Maven Plugin requires JDK 17 to run.
 
 ## License
