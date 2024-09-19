@@ -1,5 +1,9 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R11
+
+* Update Google Closure Compiler to v20240317
+
 ## 2.8.0-PATCHPUMP-R10
 
 * Add plexus-utils dependency for Maven 3.9
