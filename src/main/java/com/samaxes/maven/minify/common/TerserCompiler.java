@@ -11,16 +11,16 @@ import javax.script.ScriptException;
 import org.apache.commons.io.IOUtils;
 
 /**
- * UglifyJS 2 compiler.
+ * terser compiler.
  * 
  * @author patchpump
  */
-public class UglifyJS2Compiler extends AbstractJavaScriptCompiler {
+public class TerserCompiler extends AbstractJavaScriptCompiler {
 
-	public UglifyJS2Compiler() throws IOException, ScriptException {
-		super("/META-INF/uglifyjs/uglifyjs-min-2.7.3.js");
+	public TerserCompiler() throws IOException, ScriptException {
+		super("/META-INF/terser/bundle.min.js");
 	}
-
+	
 	@Override
 	public String compile(InputStreamReader reader) throws IOException, ScriptException, NoSuchMethodException {
 		String source = IOUtils.toString(reader);
@@ -28,7 +28,7 @@ public class UglifyJS2Compiler extends AbstractJavaScriptCompiler {
 			ScriptEngine engine = script.getEngine();
 			Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
 			bindings.put("input", source);
-			return (String)engine.eval("uglifysmth()", bindings);
+			return (String)engine.eval("minifymth()", bindings);
 		}
 	}
 }

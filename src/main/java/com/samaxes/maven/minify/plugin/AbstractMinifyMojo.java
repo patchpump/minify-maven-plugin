@@ -20,7 +20,7 @@ import com.samaxes.maven.minify.common.YuiConfig;
 public abstract class AbstractMinifyMojo extends AbstractMojo {
 
 	public static enum Engine {
-		YUI, CLOSURE, UGLIFY, UGLIFY2, UGLIFY3;
+		 CLOSURE, TERSER, YUI
 	}
 
 	/**
@@ -236,8 +236,6 @@ public abstract class AbstractMinifyMojo extends AbstractMojo {
 	 * <ul>
 	 * <li>{@code YUI}: <a href="http://yui.github.io/yuicompressor/">YUI Compressor</a></li>
 	 * <li>{@code CLOSURE}: <a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a></li>
-	 * <li>{@code UGLIFY2}: Uglify 2 compiler</li>
-	 * <li>{@code UGLIFY3}: Uglify 3 compiler</li>
 	 * </ul>
 	 *
 	 * @since 1.6

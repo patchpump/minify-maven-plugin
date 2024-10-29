@@ -44,8 +44,7 @@ import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.google.javascript.jscomp.jarjar.com.google.common.collect.Lists;
 import com.samaxes.maven.minify.common.JavaScriptErrorReporter;
-import com.samaxes.maven.minify.common.UglifyJS2Compiler;
-import com.samaxes.maven.minify.common.UglifyJS3Compiler;
+import com.samaxes.maven.minify.common.TerserCompiler;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 /**
@@ -142,13 +141,8 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 					opt.yuiConfig.isPreserveSemicolons(), opt.yuiConfig.isDisableOptimizations());
 				break;
 
-			case UGLIFY2:
-				new UglifyJS2Compiler().compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
-				break;
-
-			case UGLIFY:
-			case UGLIFY3:
-				new UglifyJS3Compiler().compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
+			case TERSER:
+				new TerserCompiler().compile(reader, writer, new JavaScriptErrorReporter(log, mergedFile.getName()));
 				break;
 
 			default:

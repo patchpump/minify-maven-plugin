@@ -12,12 +12,11 @@ import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
-
 /**
- * JavaScriptCompiler backed by Nashorn.
+ * JavaScriptCompiler backed by the graal.js script engine.
  * 
  * NOTE: not thread-safe as compiler source is only evaluated once and bindings is re-used
  * 
@@ -25,7 +24,8 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
  */
 public abstract class AbstractJavaScriptCompiler {
 
-	private static final ScriptEngine scriptEngine = new NashornScriptEngineFactory().getScriptEngine();
+	private static final ScriptEngineManager manager = new ScriptEngineManager();
+	private static final ScriptEngine scriptEngine = manager.getEngineByName("graal.js");
 	private static final Map<String,CompiledScript> scriptCache = new ConcurrentHashMap<>();
 
 	protected final CompiledScript script;
