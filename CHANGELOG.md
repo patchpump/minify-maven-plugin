@@ -1,5 +1,13 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R14
+
+* Add zstd option for leaving Zstandard compressed file
+
+## 2.8.0-PATCHPUMP-R13
+
+* Switch from UglfyJS and Nashorn to Terser and GraalVM
+
 ## 2.8.0-PATCHPUMP-R11
 
 * Update Google Closure Compiler to v20240317

@@ -40,13 +40,14 @@ public class TaskOptions {
 	final List<String> sourceIncludes;
 	final List<String> sourceExcludes;
 	final boolean gzip;
+	final boolean zstd;
 	final Type type;
 	ClosureConfig closureConfig;
 
 	private TaskOptions(Log log, boolean verbose, boolean debug, boolean incrementalBuild, Integer bufferSize, String charset, String suffix, boolean nosuffix,
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String sourceDir,
 		String sourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-		String targetDir, String mergedFilename, Engine engine, YuiConfig yuiConfig, boolean gzip,
+		String targetDir, String mergedFilename, Engine engine, YuiConfig yuiConfig, boolean gzip, boolean zstd,
 		ClosureConfig closureConfig, Type type) {
 
 		this.log = log;
@@ -71,6 +72,7 @@ public class TaskOptions {
 		this.engine = engine;
 		this.yuiConfig = yuiConfig;
 		this.gzip = gzip;
+		this.zstd = zstd;
 		this.type = type;
 		this.closureConfig = closureConfig;
 	}
@@ -82,11 +84,11 @@ public class TaskOptions {
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String cssSourceDir,
 		String cssSourceIncludeDir, List<String> cssSourceFiles, List<String> cssSourceIncludes,
 		List<String> cssSourceExcludes, String cssTargetDir, String cssFinalFile, Engine cssEngine, YuiConfig yuiConfig,
-		boolean gzip) {
+		boolean gzip, boolean zstd) {
 
 		this(log, verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
 			webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
-			cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip, null, Type.CSS);
+			cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip, zstd, null, Type.CSS);
 	}
 
 	/**
@@ -96,11 +98,11 @@ public class TaskOptions {
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String jsSourceDir,
 		String jsSourceIncludeDir, List<String> jsSourceFiles, List<String> jsSourceIncludes,
 		List<String> jsSourceExcludes, String jsTargetDir, String jsFinalFile, Engine jsEngine, YuiConfig yuiConfig,
-		ClosureConfig closureConfig, boolean gzip) {
+		ClosureConfig closureConfig, boolean gzip, boolean zstd) {
 
 		this(log, verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
 			webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,
-			jsTargetDir, jsFinalFile, jsEngine, yuiConfig, gzip, closureConfig, Type.JS);
+			jsTargetDir, jsFinalFile, jsEngine, yuiConfig, gzip, zstd, closureConfig, Type.JS);
 	}
 
 	@Override
@@ -111,6 +113,6 @@ public class TaskOptions {
 			+ ", sourceIncludeDir=" + sourceIncludeDir + ", targetDir=" + targetDir + ", mergedFilename="
 			+ mergedFilename + ", webappSourceDir=" + webappSourceDir + ", webappTargetDir=" + webappTargetDir
 			+ ", sourceFiles=" + sourceFiles + ", sourceIncludes=" + sourceIncludes + ", sourceExcludes="
-			+ sourceExcludes + ", gzip=" + gzip + ", type=" + type + ", closureConfig=" + closureConfig + "]";
+			+ sourceExcludes + ", gzip=" + gzip + ", zstd=" + zstd + ", type=" + type + ", closureConfig=" + closureConfig + "]";
 	}
 }

@@ -75,7 +75,8 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 
 		minifiedFile.getParentFile().mkdirs();
 
-		File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
+		File gzipFile = new File(minifiedFile.getAbsolutePath() + ".gz");
+		File zstdFile = new File(minifiedFile.getAbsolutePath() + ".zst");
 		OutputStream out = new FileOutputStream(minifiedFile);
 		try (InputStream in = new FileInputStream(mergedFile);
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
@@ -155,7 +156,8 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 		} catch (Exception e) {
 			close(out);
 			minifiedFile.delete();
-			compressedFile.delete();
+			gzipFile.delete();
+			zstdFile.delete();
 			log.error("Failed to compress the JavaScript file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
 			throw new IOException(e);
 
@@ -164,7 +166,10 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 		}
 
 		if (opt.gzip)
-			gzip(minifiedFile, compressedFile);
+			gzip(minifiedFile, gzipFile);
+
+		if (opt.zstd)
+			zstd(minifiedFile, zstdFile);
 	}
 
 	private void flushSourceMap(File sourceMapOutputFile, String minifyFileName, SourceMap sourceMap) {

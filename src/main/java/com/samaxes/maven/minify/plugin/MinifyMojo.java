@@ -124,7 +124,7 @@ public class MinifyMojo extends AbstractMinifyMojo {
 
 		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
 			skipMinify, webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles,
-			cssSourceIncludes, cssSourceExcludes, cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip);
+			cssSourceIncludes, cssSourceExcludes, cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip, zstd);
 
 		return new ProcessCSSFilesTask(opt);
 	}
@@ -134,7 +134,7 @@ public class MinifyMojo extends AbstractMinifyMojo {
 
 		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
 			skipMinify, webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles,
-			jsSourceIncludes, jsSourceExcludes, jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip);
+			jsSourceIncludes, jsSourceExcludes, jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip, zstd);
 
 		return new ProcessJSFilesTask(opt);
 	}

@@ -103,6 +103,14 @@ public abstract class AbstractMinifyMojo extends AbstractMojo {
 	protected boolean gzip;
 
 	/**
+	 * Zstandard compress target file into targetfile.zst
+	 *
+	 * @since 2.8.0-PATCHPUMP-R14
+	 */
+	@Parameter(property = "zstd", defaultValue = "false")
+	protected boolean zstd;
+
+	/**
 	 * Webapp source directory.
 	 */
 	@Parameter(property = "webappSourceDir", defaultValue = "${basedir}/src/main/webapp")

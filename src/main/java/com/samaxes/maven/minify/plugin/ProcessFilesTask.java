@@ -40,6 +40,8 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
+import com.github.luben.zstd.ZstdOutputStream;
+import com.github.luben.zstd.ZstdOutputStreamNoFinalizer;
 import com.samaxes.maven.minify.common.SourceFilesEnumeration;
 
 /**
@@ -252,7 +254,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	abstract void minify(File sourceFile, File targetFile) throws IOException;
 
 	/**
-	 * Gzip file.
+	 * Gzip compress file.
 	 * 
 	 * @param source source file
 	 * @param target target file
@@ -262,6 +264,20 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 			OutputStream out = new FileOutputStream(target);
 			GZIPOutputStream outGZIP = new GZIPOutputStream(out)) {
 			IOUtil.copy(in, outGZIP, opt.bufferSize);
+		}
+	}
+
+	/**
+	 * Zstandard compress file.
+	 * 
+	 * @param source source file
+	 * @param target target file
+	 */
+	protected void zstd(File source, File target) throws IOException {
+		try (InputStream in = new FileInputStream(source);
+			OutputStream out = new FileOutputStream(target);
+			ZstdOutputStreamNoFinalizer outZstd = new ZstdOutputStreamNoFinalizer(out)) {
+			IOUtil.copy(in, outZstd, opt.bufferSize);
 		}
 	}
 
