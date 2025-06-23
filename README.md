@@ -18,12 +18,15 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
     <plugin>
       <groupId>patchpump.minify</groupId>
       <artifactId>minify-maven-plugin</artifactId>
-      <version>2.8.0-PATCHPUMP-13</version>
+      <version>2.8.0-PATCHPUMP-15</version>
       <executions>
         <execution>
           <id>default-minify</id>
           <configuration>
             <charset>UTF-8</charset>
+            <verbose>false</verbose>
+            <gzip>true</gzip>
+            <zstd>5</zstd>
             <cssSourceFiles>
               <cssSourceFile>file-1.css</cssSourceFile>
               <!-- ... -->
@@ -35,6 +38,7 @@ Configure your project's `pom.xml` to run the plugin during the project's build 
               <jsSourceFile>file-n.js</jsSourceFile>
             </jsSourceFiles>
             <jsEngine>CLOSURE</jsEngine>
+            <closureLanguage>UNSTABLE</closureLanguage>
             <closureWarningLevels>
                 <misplacedTypeAnnotation>OFF</misplacedTypeAnnotation>
                 <nonStandardJsDocs>OFF</nonStandardJsDocs>

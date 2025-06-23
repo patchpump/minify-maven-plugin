@@ -1,5 +1,9 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R15
+
+* Use zstd for both JS and CSS files 
+
 ## 2.8.0-PATCHPUMP-R14
 
 * Add zstd option for leaving Zstandard compressed file
