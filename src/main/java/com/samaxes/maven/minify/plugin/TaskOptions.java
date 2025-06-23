@@ -21,7 +21,7 @@ public class TaskOptions {
 	final boolean verbose;
 	final boolean debug;
 	final boolean incrementalBuild;
-	final Integer bufferSize;
+	final int bufferSize;
 	final String charset;
 	final String suffix;
 	final boolean nosuffix;
@@ -40,14 +40,14 @@ public class TaskOptions {
 	final List<String> sourceIncludes;
 	final List<String> sourceExcludes;
 	final boolean gzip;
-	final boolean zstd;
+	final int zstd;
 	final Type type;
 	ClosureConfig closureConfig;
 
-	private TaskOptions(Log log, boolean verbose, boolean debug, boolean incrementalBuild, Integer bufferSize, String charset, String suffix, boolean nosuffix,
+	private TaskOptions(Log log, boolean verbose, boolean debug, boolean incrementalBuild, int bufferSize, String charset, String suffix, boolean nosuffix,
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String sourceDir,
 		String sourceIncludeDir, List<String> sourceFiles, List<String> sourceIncludes, List<String> sourceExcludes,
-		String targetDir, String mergedFilename, Engine engine, YuiConfig yuiConfig, boolean gzip, boolean zstd,
+		String targetDir, String mergedFilename, Engine engine, YuiConfig yuiConfig, boolean gzip, int zstd,
 		ClosureConfig closureConfig, Type type) {
 
 		this.log = log;
@@ -80,11 +80,11 @@ public class TaskOptions {
 	/**
 	 * CSS task options
 	 */
-	public TaskOptions(Log log, boolean verbose, boolean debug, boolean incrementalBuild, Integer bufferSize, String charset, String suffix, boolean nosuffix,
+	public TaskOptions(Log log, boolean verbose, boolean debug, boolean incrementalBuild, int bufferSize, String charset, String suffix, boolean nosuffix,
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String cssSourceDir,
 		String cssSourceIncludeDir, List<String> cssSourceFiles, List<String> cssSourceIncludes,
 		List<String> cssSourceExcludes, String cssTargetDir, String cssFinalFile, Engine cssEngine, YuiConfig yuiConfig,
-		boolean gzip, boolean zstd) {
+		boolean gzip, int zstd) {
 
 		this(log, verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
 			webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
@@ -98,7 +98,7 @@ public class TaskOptions {
 		boolean skipMerge, boolean skipMinify, String webappSourceDir, String webappTargetDir, String jsSourceDir,
 		String jsSourceIncludeDir, List<String> jsSourceFiles, List<String> jsSourceIncludes,
 		List<String> jsSourceExcludes, String jsTargetDir, String jsFinalFile, Engine jsEngine, YuiConfig yuiConfig,
-		ClosureConfig closureConfig, boolean gzip, boolean zstd) {
+		ClosureConfig closureConfig, boolean gzip, int zstd) {
 
 		this(log, verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge, skipMinify, webappSourceDir,
 			webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles, jsSourceIncludes, jsSourceExcludes,

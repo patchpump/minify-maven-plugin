@@ -107,8 +107,8 @@ public abstract class AbstractMinifyMojo extends AbstractMojo {
 	 *
 	 * @since 2.8.0-PATCHPUMP-R14
 	 */
-	@Parameter(property = "zstd", defaultValue = "false")
-	protected boolean zstd;
+	@Parameter(property = "zstd", defaultValue = "0")
+	protected int zstd;
 
 	/**
 	 * Webapp source directory.

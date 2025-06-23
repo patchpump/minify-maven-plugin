@@ -272,11 +272,13 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * 
 	 * @param source source file
 	 * @param target target file
+	 * @param level compression level
 	 */
-	protected void zstd(File source, File target) throws IOException {
+	protected void zstd(File source, File target, int level) throws IOException {
 		try (InputStream in = new FileInputStream(source);
 			OutputStream out = new FileOutputStream(target);
 			ZstdOutputStreamNoFinalizer outZstd = new ZstdOutputStreamNoFinalizer(out)) {
+			outZstd.setLevel(level);
 			IOUtil.copy(in, outZstd, opt.bufferSize);
 		}
 	}

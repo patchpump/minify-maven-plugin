@@ -57,6 +57,7 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 
 		minifiedFile.getParentFile().mkdirs();
 		File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
+		File zstdFile = new File(minifiedFile.getAbsolutePath() + ".zst");
 		OutputStream out = new FileOutputStream(minifiedFile);
 		try (InputStream in = new FileInputStream(mergedFile);
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
@@ -91,5 +92,8 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 
 		if (opt.gzip)
 			gzip(minifiedFile, compressedFile);
+
+		if (opt.zstd > 0)
+			zstd(minifiedFile, zstdFile, opt.zstd);
 	}
 }
