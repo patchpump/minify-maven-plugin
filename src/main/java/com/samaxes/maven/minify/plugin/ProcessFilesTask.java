@@ -1,5 +1,5 @@
 /*
- * Minify Maven Plugin
+ * Minify Maven Plugin§
  * https://github.com/samaxes/minify-maven-plugin
  *
  * Copyright (c) 2009 samaxes.com
@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 package com.samaxes.maven.minify.plugin;
+
+import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,11 +30,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.maven.plugin.logging.Log;
@@ -40,7 +45,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
-import com.github.luben.zstd.ZstdOutputStream;
+import com.github.luben.zstd.ZstdDictCompress;
 import com.github.luben.zstd.ZstdOutputStreamNoFinalizer;
 import com.samaxes.maven.minify.common.SourceFilesEnumeration;
 
@@ -49,7 +54,10 @@ import com.samaxes.maven.minify.common.SourceFilesEnumeration;
  */
 public abstract class ProcessFilesTask implements Callable<Object> {
 
+	private static final byte[] DCZ_HEADER = new byte[] { (byte)0x5e, (byte)0x2a, (byte)0x4d, (byte)0x18, (byte)0x20, (byte)0x00, (byte)0x00, (byte)0x00 };
 	private static final String TEMP_SUFFIX = ".tmp";
+
+	protected static final ConcurrentHashMap<String,ZstdDictCompress> dictCache = new ConcurrentHashMap<>();
 
 	final Log log;
 	final File sourceDir;
@@ -260,6 +268,9 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * @param target target file
 	 */
 	protected void gzip(File source, File target) throws IOException {
+
+		log.info("Compressing file [" + target + ']');
+
 		try (InputStream in = new FileInputStream(source);
 			OutputStream out = new FileOutputStream(target);
 			GZIPOutputStream outGZIP = new GZIPOutputStream(out)) {
@@ -275,12 +286,88 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * @param level compression level
 	 */
 	protected void zstd(File source, File target, int level) throws IOException {
+
+		log.info("Compressing file [" + target + ']');
+
 		try (InputStream in = new FileInputStream(source);
 			OutputStream out = new FileOutputStream(target);
 			ZstdOutputStreamNoFinalizer outZstd = new ZstdOutputStreamNoFinalizer(out)) {
 			outZstd.setLevel(level);
 			IOUtil.copy(in, outZstd, opt.bufferSize);
 		}
+	}
+
+	/**
+	 * Zstandard compress file with dictionary.
+	 * 
+	 * @param source source file
+	 * @param target target file
+	 * @param dictionaryDir dictionary dir with {ext}.zstd.dict files
+	 * @param level compression level
+	 */
+	protected void zstd(File source, File target, String dictionaryDir, int level) throws IOException {
+
+		if (dictionaryDir == null)
+			return;
+
+		String extension = FileUtils.getExtension(source.getName());
+		if (extension.isBlank())
+			return;
+
+		File dictionaryFile = new File(dictionaryDir, extension + ".zstd.dict");
+		log.info("Compressing file [" + target + "] with dictionary [" + dictionaryFile + ']');
+		if (!dictionaryFile.canRead())
+			return;
+
+		byte[] dictionary = readFileToByteArray(dictionaryFile);
+		final byte[] rawDictionary = toRawDictionary(dictionary);
+		
+		ZstdDictCompress dict = dictCache.computeIfAbsent(
+			dictionaryFile.getAbsolutePath() + ":" + level,
+			k -> new ZstdDictCompress(rawDictionary, level)
+		);
+
+		try (OutputStream out = new FileOutputStream(target)) {
+			writeDczHeader(out, rawDictionary);
+			out.flush();
+			try (InputStream in = new FileInputStream(source);
+				ZstdOutputStreamNoFinalizer outZstd = new ZstdOutputStreamNoFinalizer(out)) {
+				outZstd.setDict(dict);
+				outZstd.setLevel(level);
+				IOUtil.copy(in, outZstd, opt.bufferSize);
+			}
+		}
+	}
+
+	/**
+	 * Write RFC 9842 c40-byte DCZ header.
+	 * 
+	 * @param out target stream
+	 * @param dictionary raw dictionary
+	 */
+	private static void writeDczHeader(OutputStream out, byte[] dictionary) throws IOException {
+
+		out.write(DCZ_HEADER);
+
+		try {
+			out.write(MessageDigest.getInstance("SHA-256").digest(dictionary));
+		} catch (NoSuchAlgorithmException e) {
+			throw new IOException(e);
+		}
+	}
+
+	/**
+	 * Strip dictionary magic if present to make it "raw" needed for dicts generated with zstd --train CLI.
+	 * 
+	 * https://github.com/facebook/zstd/issues/4389
+	 *  
+	 * @param dict dictionary
+	 * @return raw dictionary
+	 */
+	private static byte[] toRawDictionary(byte[] dict) {
+
+		return dict.length >= 4 && (dict[0] & 0xFF) == 0x37 && (dict[1] & 0xFF) == 0xA4 && (dict[2] & 0xFF) == 0x30 && (dict[3] & 0xFF) == 0xEC
+			? java.util.Arrays.copyOfRange(dict, 4, dict.length) : dict;
 	}
 
 	/**
@@ -337,7 +424,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 */
 	private List<File> getFilesToInclude(List<String> includes, List<String> excludes) {
 
-		List<File> includedFiles = new ArrayList<File>();
+		List<File> includedFiles = new ArrayList<>();
 
 		if (includes != null && !includes.isEmpty()) {
 

@@ -19,8 +19,8 @@ import com.samaxes.maven.minify.common.YuiConfig;
 
 public abstract class AbstractMinifyMojo extends AbstractMojo {
 
-	public static enum Engine {
-		 CLOSURE, TERSER, YUI
+	public enum Engine {
+		CLOSURE, TERSER, YUI
 	}
 
 	/**
@@ -109,6 +109,14 @@ public abstract class AbstractMinifyMojo extends AbstractMojo {
 	 */
 	@Parameter(property = "zstd", defaultValue = "0")
 	protected int zstd;
+
+	/**
+	 * Zstandard compress target into targetifle.dcz using pre-trained dictionary.
+	 *
+	 * @since 2.8.0-PATCHPUMP-R16
+	 */
+	@Parameter(property = "zstdDirectoryDir")
+	protected String zstdDirectoryDir;
 
 	/**
 	 * Webapp source directory.

@@ -1,5 +1,10 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R16
+
+* Add zstdDictionaryDir for dcz compression
+* Bump dependency versions
+
 ## 2.8.0-PATCHPUMP-R15
 
 * Use zstd for both JS and CSS files 

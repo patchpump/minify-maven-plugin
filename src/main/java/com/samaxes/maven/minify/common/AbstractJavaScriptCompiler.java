@@ -49,7 +49,7 @@ public abstract class AbstractJavaScriptCompiler {
 
 	protected abstract String compile(InputStreamReader reader) throws IOException, ScriptException, NoSuchMethodException;
 
-	public void compile(InputStreamReader reader, OutputStreamWriter writer, JavaScriptErrorReporter javaScriptErrorReporter) throws NoSuchMethodException, IOException, ScriptException {
+	public void compile(InputStreamReader reader, OutputStreamWriter writer, @SuppressWarnings("unused") JavaScriptErrorReporter javaScriptErrorReporter) throws NoSuchMethodException, IOException, ScriptException {
 		writer.write(compile(reader));
 	}
 }

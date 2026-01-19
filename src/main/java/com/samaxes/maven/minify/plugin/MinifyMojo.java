@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,9 +49,6 @@ import com.samaxes.maven.minify.common.YuiConfig;
 @Mojo(name = "minify", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, threadSafe = true)
 public class MinifyMojo extends AbstractMinifyMojo {
 
-	/**
-	 * Executed when the goal is invoked, it will first invoke a parallel lifecycle, ending at the given phase.
-	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -103,14 +100,14 @@ public class MinifyMojo extends AbstractMinifyMojo {
 
 			for (Aggregation aggregation : aggregationConfiguration.getBundles()) {
 				if (Aggregation.AggregationType.css.equals(aggregation.getType()))
-					tasks.add(createCSSTask(yuiConfig, closureConfig, aggregation.getFiles(),
+					tasks.add(createCSSTask(yuiConfig, aggregation.getFiles(),
 						Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
 				else if (Aggregation.AggregationType.js.equals(aggregation.getType()))
 					tasks.add(createJSTask(yuiConfig, closureConfig, aggregation.getFiles(),
 						Collections.<String> emptyList(), Collections.<String> emptyList(), aggregation.getName()));
 			}
 		} else {
-			tasks.add(createCSSTask(yuiConfig, closureConfig, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
+			tasks.add(createCSSTask(yuiConfig, cssSourceFiles, cssSourceIncludes, cssSourceExcludes,
 				cssFinalFile));
 			tasks.add(
 				createJSTask(yuiConfig, closureConfig, jsSourceFiles, jsSourceIncludes, jsSourceExcludes, jsFinalFile));
@@ -118,12 +115,11 @@ public class MinifyMojo extends AbstractMinifyMojo {
 		return tasks;
 	}
 
-	private ProcessFilesTask createCSSTask(YuiConfig yuiConfig, ClosureConfig closureConfig,
-		List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
+	private ProcessFilesTask createCSSTask(YuiConfig yuiConfig, List<String> cssSourceFiles, List<String> cssSourceIncludes, List<String> cssSourceExcludes,
 		String cssFinalFile) throws FileNotFoundException {
 
 		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
-			skipMinify, webappSourceDir, webappTargetDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles,
+			skipMinify, webappSourceDir, webappTargetDir, zstdDirectoryDir, cssSourceDir, cssSourceIncludeDir, cssSourceFiles,
 			cssSourceIncludes, cssSourceExcludes, cssTargetDir, cssFinalFile, cssEngine, yuiConfig, gzip, zstd);
 
 		return new ProcessCSSFilesTask(opt);
@@ -133,7 +129,7 @@ public class MinifyMojo extends AbstractMinifyMojo {
 		List<String> jsSourceIncludes, List<String> jsSourceExcludes, String jsFinalFile) throws FileNotFoundException {
 
 		TaskOptions opt = new TaskOptions(getLog(), verbose, debug, incrementalBuild, bufferSize, charset, suffix, nosuffix, skipMerge,
-			skipMinify, webappSourceDir, webappTargetDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles,
+			skipMinify, webappSourceDir, webappTargetDir, zstdDirectoryDir, jsSourceDir, jsSourceIncludeDir, jsSourceFiles,
 			jsSourceIncludes, jsSourceExcludes, jsTargetDir, jsFinalFile, jsEngine, yuiConfig, closureConfig, gzip, zstd);
 
 		return new ProcessJSFilesTask(opt);

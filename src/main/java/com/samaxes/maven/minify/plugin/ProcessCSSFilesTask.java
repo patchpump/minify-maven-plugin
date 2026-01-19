@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,6 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 	 *
 	 * @throws FileNotFoundException when the given source file does not exist
 	 */
-
 	public ProcessCSSFilesTask(final TaskOptions opt) throws FileNotFoundException {
 		super(opt);
 	}
@@ -58,6 +57,7 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 		minifiedFile.getParentFile().mkdirs();
 		File compressedFile = new File(minifiedFile.getAbsolutePath() + ".gz");
 		File zstdFile = new File(minifiedFile.getAbsolutePath() + ".zst");
+		File dczFile = new File(minifiedFile.getAbsolutePath() + ".dcz");
 		OutputStream out = new FileOutputStream(minifiedFile);
 		try (InputStream in = new FileInputStream(mergedFile);
 			InputStreamReader reader = new InputStreamReader(in, opt.charset);
@@ -83,6 +83,7 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 			close(out);
 			minifiedFile.delete();
 			compressedFile.delete();
+			dczFile.delete();
 			log.error("Failed to compress the CSS file [" + ((opt.verbose) ? mergedFile.getPath() : mergedFile.getName()) + "].", e);
 			throw new IOException(e);
 
@@ -93,7 +94,10 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 		if (opt.gzip)
 			gzip(minifiedFile, compressedFile);
 
-		if (opt.zstd > 0)
+		if (opt.zstd > 0) {
 			zstd(minifiedFile, zstdFile, opt.zstd);
+			if (opt.zstdDirectoryDir != null)
+				zstd(minifiedFile, dczFile, opt.zstdDirectoryDir, opt.zstd);
+		}
 	}
 }
