@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -38,10 +38,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import com.google.gson.Gson;
 import com.google.javascript.jscomp.jarjar.com.google.common.base.Strings;
 import com.google.javascript.jscomp.jarjar.com.google.common.collect.Lists;
-import com.samaxes.maven.minify.common.Aggregation;
-import com.samaxes.maven.minify.common.AggregationConfiguration;
-import com.samaxes.maven.minify.common.ClosureConfig;
-import com.samaxes.maven.minify.common.YuiConfig;
+
+import patchpump.minify.maven.common.Aggregation;
+import patchpump.minify.maven.common.AggregationConfiguration;
+import patchpump.minify.maven.common.ClosureConfig;
+import patchpump.minify.maven.common.YuiConfig;
 
 /**
  * Goal for combining and minifying CSS and JavaScript files.

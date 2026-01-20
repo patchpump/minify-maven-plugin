@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 
@@ -47,7 +47,8 @@ import org.codehaus.plexus.util.IOUtil;
 
 import com.github.luben.zstd.ZstdDictCompress;
 import com.github.luben.zstd.ZstdOutputStreamNoFinalizer;
-import com.samaxes.maven.minify.common.SourceFilesEnumeration;
+
+import patchpump.minify.maven.common.SourceFilesEnumeration;
 
 /**
  * Abstract class for merging and compressing a files list.

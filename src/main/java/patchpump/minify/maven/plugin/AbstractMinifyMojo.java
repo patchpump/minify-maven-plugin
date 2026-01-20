@@ -1,4 +1,4 @@
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -13,14 +13,16 @@ import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.DependencyOptions;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.jarjar.com.google.common.base.Strings;
+
+import patchpump.minify.maven.common.ClosureConfig;
+import patchpump.minify.maven.common.YuiConfig;
+
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
-import com.samaxes.maven.minify.common.ClosureConfig;
-import com.samaxes.maven.minify.common.YuiConfig;
 
 public abstract class AbstractMinifyMojo extends AbstractMojo {
 
 	public enum Engine {
-		CLOSURE, TERSER, YUI
+		CLOSURE, TERSER, YUI, SAFECSS
 	}
 
 	/**

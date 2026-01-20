@@ -1,12 +1,12 @@
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
-import com.samaxes.maven.minify.common.ClosureConfig;
-import com.samaxes.maven.minify.common.YuiConfig;
-import com.samaxes.maven.minify.plugin.AbstractMinifyMojo.Engine;
+import patchpump.minify.maven.common.ClosureConfig;
+import patchpump.minify.maven.common.YuiConfig;
+import patchpump.minify.maven.plugin.AbstractMinifyMojo.Engine;
 
 /**
  * Task options with horrible constructors.

@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +28,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import com.yahoo.platform.yui.compressor.CssCompressor;
+import patchpump.minify.maven.common.SafeCssCompressor;
+import patchpump.minify.maven.common.YuiCssCompressor;
 
 /**
  * Task for merging and compressing CSS files.
@@ -68,8 +69,13 @@ public class ProcessCSSFilesTask extends ProcessFilesTask {
 			switch (opt.engine) {
 			case YUI:
 				log.debug("Using YUI Compressor engine.");
-				CssCompressor compressor = new CssCompressor(reader);
+				YuiCssCompressor compressor = new YuiCssCompressor(reader);
 				compressor.compress(writer, opt.yuiConfig.getLineBreak());
+				break;
+
+			case SAFECSS:
+				log.debug("Using SAFECSS Compressor engine.");
+				new SafeCssCompressor(reader).compress(writer);
 				break;
 
 			default:

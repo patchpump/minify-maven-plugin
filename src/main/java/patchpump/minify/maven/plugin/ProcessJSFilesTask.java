@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.samaxes.maven.minify.plugin;
+package patchpump.minify.maven.plugin;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,9 +43,10 @@ import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.SourceFile;
 import com.google.javascript.jscomp.SourceMap;
 import com.google.javascript.jscomp.jarjar.com.google.common.collect.Lists;
-import com.samaxes.maven.minify.common.JavaScriptErrorReporter;
-import com.samaxes.maven.minify.common.TerserCompiler;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
+
+import patchpump.minify.maven.common.JavaScriptErrorReporter;
+import patchpump.minify.maven.common.TerserCompiler;
 
 /**
  * Task for merging and compressing JavaScript files.
