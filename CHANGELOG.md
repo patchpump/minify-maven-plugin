@@ -1,5 +1,12 @@
 # Minify Maven Plugin
 
+## 2.8.0-PATCHPUMP-R17
+
+* Add SafeCssCompressor as SAFECSS to replace inherently fragile YUI compressor
+* Patch YUI CssCompressor to not strip deg suffix as breaks @property
+
+* Bump dependency versions
+
 ## 2.8.0-PATCHPUMP-R16
 
 * Add zstdDictionaryDir for dcz compression
