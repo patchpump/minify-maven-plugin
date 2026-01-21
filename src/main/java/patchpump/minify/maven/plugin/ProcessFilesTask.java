@@ -283,10 +283,23 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 	 * Zstandard compress file.
 	 * 
 	 * @param source source file
-	 * @param target target file
-	 * @param level compression level
+	 * @param zstdTarget target zstd file
+	 * @param dczTarget target dcz file
+	 * @throws IOException 
 	 */
-	protected void zstd(File source, File target, int level) throws IOException {
+	protected void zstd(File source, File zstdTarget, File dczTarget) throws IOException {
+
+		zstd(source, zstdTarget, opt.zstd);
+		if (opt.zstdDirectoryDir != null) {
+			zstd(source, dczTarget, opt.zstdDirectoryDir, opt.zstd);
+			if (dczTarget.exists() && zstdTarget.exists() && dczTarget.length() >= zstdTarget.length()) {
+				log.info("Discarding dcz file as larger than zstd file");
+				dczTarget.delete();
+			}
+		}
+	}
+
+	private void zstd(File source, File target, int level) throws IOException {
 
 		log.info("Compressing file [" + target + ']');
 
@@ -298,27 +311,17 @@ public abstract class ProcessFilesTask implements Callable<Object> {
 		}
 	}
 
-	/**
-	 * Zstandard compress file with dictionary.
-	 * 
-	 * @param source source file
-	 * @param target target file
-	 * @param dictionaryDir dictionary dir with {ext}.zstd.dict files
-	 * @param level compression level
-	 */
-	protected void zstd(File source, File target, String dictionaryDir, int level) throws IOException {
-
-		if (dictionaryDir == null)
-			return;
+	private void zstd(File source, File target, String dictionaryDir, int level) throws IOException {
 
 		String extension = FileUtils.getExtension(source.getName());
 		if (extension.isBlank())
 			return;
 
 		File dictionaryFile = new File(dictionaryDir, extension + ".zstd.dict");
-		log.info("Compressing file [" + target + "] with dictionary [" + dictionaryFile + ']');
 		if (!dictionaryFile.canRead())
 			return;
+
+		log.info("Compressing file [" + target + "] with dictionary [" + dictionaryFile + ']');
 
 		byte[] dictionary = readFileToByteArray(dictionaryFile);
 		final byte[] rawDictionary = toRawDictionary(dictionary);

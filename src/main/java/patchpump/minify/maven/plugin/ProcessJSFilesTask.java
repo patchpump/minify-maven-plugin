@@ -171,11 +171,8 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 		if (opt.gzip)
 			gzip(minifiedFile, gzipFile);
 
-		if (opt.zstd > 0) {
-			zstd(minifiedFile, zstdFile, opt.zstd);
-			if (opt.zstdDirectoryDir != null)
-				zstd(minifiedFile, dczFile, opt.zstdDirectoryDir, opt.zstd);
-		}
+		if (opt.zstd > 0)
+			zstd(minifiedFile, zstdFile, dczFile);
 	}
 
 	private void flushSourceMap(File sourceMapOutputFile, String minifyFileName, SourceMap sourceMap) {
